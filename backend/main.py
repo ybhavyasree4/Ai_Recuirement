@@ -1,6 +1,7 @@
 from fastapi import FastAPI, Depends, UploadFile, File, HTTPException
 from sqlalchemy.orm import Session
 from pathlib import Path
+import json
 
 from database import SessionLocal
 from models import Candidate, Job, JobApplication
@@ -10,6 +11,7 @@ from candidate_profiling import profile_candidate
 from candidate_matching import match_candidate
 from skill_gap import analyze_candidate_skill_gaps
 from ranking import generate_rankings
+from ai_recommendation import generate_ai_recommendations
 
 
 app = FastAPI(
@@ -18,6 +20,7 @@ app = FastAPI(
 
 
 def get_db():
+
     db = SessionLocal()
 
     try:
@@ -28,8 +31,10 @@ def get_db():
 
 @app.get("/")
 def home():
+
     return {
-        "message": "AI Recruitment Platform API is running"
+        "message":
+            "AI Recruitment Platform API is running"
     }
 
 
@@ -37,6 +42,7 @@ def home():
 def get_candidates(
     db: Session = Depends(get_db)
 ):
+
     return db.query(Candidate).all()
 
 
@@ -46,11 +52,14 @@ def get_candidate(
     db: Session = Depends(get_db)
 ):
 
-    candidate = db.query(Candidate).filter(
+    candidate = db.query(
+        Candidate
+    ).filter(
         Candidate.candidate_id == candidate_id
     ).first()
 
     if not candidate:
+
         raise HTTPException(
             status_code=404,
             detail="Candidate not found"
@@ -63,6 +72,7 @@ def get_candidate(
 def get_jobs(
     db: Session = Depends(get_db)
 ):
+
     return db.query(Job).all()
 
 
@@ -72,11 +82,14 @@ def get_job(
     db: Session = Depends(get_db)
 ):
 
-    job = db.query(Job).filter(
+    job = db.query(
+        Job
+    ).filter(
         Job.job_id == job_id
     ).first()
 
     if not job:
+
         raise HTTPException(
             status_code=404,
             detail="Job not found"
@@ -89,6 +102,7 @@ def get_job(
 def get_applications(
     db: Session = Depends(get_db)
 ):
+
     return db.query(JobApplication).all()
 
 
@@ -98,6 +112,7 @@ async def upload_resume(
 ):
 
     if not file.filename.lower().endswith(".pdf"):
+
         raise HTTPException(
             status_code=400,
             detail="Only PDF files are allowed"
@@ -117,17 +132,23 @@ async def upload_resume(
             temp_file
         )
 
-        candidate_id = upload_result["candidate_id"]
+        candidate_id = upload_result[
+            "candidate_id"
+        ]
 
         db = SessionLocal()
 
         try:
 
-            candidate = db.query(Candidate).filter(
-                Candidate.candidate_id == candidate_id
+            candidate = db.query(
+                Candidate
+            ).filter(
+                Candidate.candidate_id ==
+                candidate_id
             ).first()
 
             if not candidate:
+
                 raise Exception(
                     "Candidate not found"
                 )
@@ -140,23 +161,16 @@ async def upload_resume(
             db.commit()
 
         finally:
+
             db.close()
 
-        if upload_result["message"] == "Resume already exists":
-            message = (
-                "Resume already exists and "
-                "was profiled successfully"
-            )
-        else:
-            message = (
-                "Resume uploaded and "
-                "profiled successfully"
-            )
-
         return {
-            "message": message,
-            "candidate": upload_result,
-            "profile": profile
+            "message":
+                "Resume uploaded and profiled successfully",
+            "candidate":
+                upload_result,
+            "profile":
+                profile
         }
 
     except Exception as e:
@@ -178,11 +192,15 @@ def match_candidate_api(
     db: Session = Depends(get_db)
 ):
 
-    candidate = db.query(Candidate).filter(
-        Candidate.candidate_id == candidate_id
+    candidate = db.query(
+        Candidate
+    ).filter(
+        Candidate.candidate_id ==
+        candidate_id
     ).first()
 
     if not candidate:
+
         raise HTTPException(
             status_code=404,
             detail="Candidate not found"
@@ -196,8 +214,10 @@ def match_candidate_api(
         )
 
         return {
-            "candidate_id": candidate_id,
-            "matches": result
+            "candidate_id":
+                candidate_id,
+            "matches":
+                result
         }
 
     except Exception as e:
@@ -216,11 +236,15 @@ def skill_gap_api(
     db: Session = Depends(get_db)
 ):
 
-    candidate = db.query(Candidate).filter(
-        Candidate.candidate_id == candidate_id
+    candidate = db.query(
+        Candidate
+    ).filter(
+        Candidate.candidate_id ==
+        candidate_id
     ).first()
 
     if not candidate:
+
         raise HTTPException(
             status_code=404,
             detail="Candidate not found"
@@ -234,8 +258,10 @@ def skill_gap_api(
         )
 
         return {
-            "candidate_id": candidate_id,
-            "skill_gaps": result
+            "candidate_id":
+                candidate_id,
+            "skill_gaps":
+                result
         }
 
     except Exception as e:
@@ -249,7 +275,9 @@ def skill_gap_api(
 
 
 @app.post("/ranking")
-def ranking_api(db: Session = Depends(get_db)):
+def ranking_api(
+    db: Session = Depends(get_db)
+):
 
     try:
 
@@ -261,51 +289,71 @@ def ranking_api(db: Session = Depends(get_db)):
 
             for result in candidates:
 
-                app = result["application"]
+                application = result[
+                    "application"
+                ]
 
                 response.append({
-                    "job_id": job_id,
-                    "candidate_id": app.candidate_id,
-                    "ranking": app.ranking,
-                    "match_score": round(
-                        float(app.match_score or 0) * 100,
-                        2
-                    ),
-                    "skill_match_percentage": round(
-                        float(app.skill_match_percentage or 0),
-                        2
-                    ),
-                    "final_score": result["final_score"]
+                    "job_id":
+                        job_id,
+                    "candidate_id":
+                        application.candidate_id,
+                    "ranking":
+                        application.ranking,
+                    "match_score":
+                        round(
+                            float(
+                                application.match_score or 0
+                            ) * 100,
+                            2
+                        ),
+                    "skill_match_percentage":
+                        round(
+                            float(
+                                application.skill_match_percentage or 0
+                            ),
+                            2
+                        ),
+                    "final_score":
+                        result["final_score"]
                 })
 
         return {
-            "message": "Ranking completed successfully",
-            "rankings": response
+            "message":
+                "Ranking completed successfully",
+            "rankings":
+                response
         }
 
     except Exception as e:
 
         db.rollback()
+
         raise HTTPException(
             status_code=500,
             detail=str(e)
         )
+
+
 @app.get("/ranking/{job_id}")
 def get_job_ranking(
     job_id: int,
     db: Session = Depends(get_db)
 ):
 
-    applications = db.query(
-        JobApplication
-    ).filter(
-        JobApplication.job_id == job_id
-    ).all()
+    applications = (
+        db.query(JobApplication)
+        .filter(
+            JobApplication.job_id == job_id
+        )
+        .all()
+    )
 
     if not applications:
+
         raise HTTPException(
             status_code=404,
-            detail="No applications found for this job"
+            detail="No applications found"
         )
 
     results = []
@@ -326,27 +374,20 @@ def get_job_ranking(
         )
 
         results.append({
+            "application_id":
+                application.application_id,
             "candidate_id":
                 application.candidate_id,
-
             "job_id":
                 application.job_id,
-
-            "ranking":
-                application.ranking,
-
             "match_score":
                 round(match_score, 2),
-
             "skill_match_percentage":
                 round(skill_score, 2),
-
             "final_score":
                 round(final_score, 2),
-
             "matched_skills":
                 application.matched_skills,
-
             "missing_skills":
                 application.missing_skills
         })
@@ -363,6 +404,93 @@ def get_job_ranking(
         result["ranking"] = rank
 
     return {
-        "job_id": job_id,
-        "rankings": results
+        "job_id":
+            job_id,
+        "rankings":
+            results
+    }
+
+
+@app.post("/ai-recommendations")
+def ai_recommendations(
+    db: Session = Depends(get_db)
+):
+
+    try:
+
+        return generate_ai_recommendations(db)
+
+    except Exception as e:
+
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+
+@app.get("/ai-recommendations/{job_id}")
+def get_ai_recommendations(
+    job_id: int,
+    db: Session = Depends(get_db)
+):
+
+    applications = (
+        db.query(JobApplication)
+        .filter(
+            JobApplication.job_id == job_id
+        )
+        .order_by(
+            JobApplication.ranking.asc()
+        )
+        .limit(5)
+        .all()
+    )
+
+    if not applications:
+
+        raise HTTPException(
+            status_code=404,
+            detail="No applications found"
+        )
+
+    results = []
+
+    for application in applications:
+
+        if not application.recommendation:
+            continue
+
+        try:
+
+            recommendation = json.loads(
+                application.recommendation
+            )
+
+        except Exception:
+
+            recommendation = {
+                "recommendation":
+                    application.recommendation
+            }
+
+        results.append({
+            "application_id":
+                application.application_id,
+            "candidate_id":
+                application.candidate_id,
+            "job_id":
+                application.job_id,
+            "ranking":
+                application.ranking,
+            "recommendation":
+                recommendation
+        })
+
+    return {
+        "job_id":
+            job_id,
+        "top_5_candidates":
+            results
     }
