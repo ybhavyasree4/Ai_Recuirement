@@ -1,36 +1,21 @@
 import os
-import warnings
-import logging
-
-warnings.filterwarnings("ignore")
+import json
+import time
 
 from dotenv import load_dotenv
-
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 
-from database import SessionLocal
 from models import JobApplication
 from ai_retrieval import get_candidate_job_data
 from rag_context import build_rag_context
-
-
-# =========================
-# LOAD ENVIRONMENT
-# =========================
 
 load_dotenv()
 
 api_key = os.getenv("GROQ_API_KEY")
 
 if not api_key:
-    print("GROQ_API_KEY not found")
-    raise SystemExit
-
-
-# =========================
-# GROQ MODEL
-# =========================
+    raise Exception("GROQ_API_KEY not found")
 
 llm = ChatGroq(
     model="openai/gpt-oss-120b",
@@ -38,162 +23,226 @@ llm = ChatGroq(
     api_key=api_key
 )
 
-
-# =========================
-# PROMPT
-# =========================
-
 prompt = ChatPromptTemplate.from_template("""
 You are an AI recruitment assistant.
 
+The candidate is already selected as one of the TOP 5 candidates for this job.
+
 Analyze the candidate and job information.
 
-Classify the candidate as exactly one:
+Return ONLY valid JSON.
 
-RECOMMENDED
-CONSIDER
-NOT RECOMMENDED
+Use exactly this format:
 
-Use:
-- ML Match Score
-- Skill Match
-- Candidate Skills
-- Required Skills
-- Education
-- Experience
-- Job Responsibilities
+{{
+    "recommendation": "RECOMMENDED",
+    "why": "One or two simple sentences explaining why the candidate is suitable.",
+    "strengths": [
+        "strength 1",
+        "strength 2"
+    ],
+    "skill_gaps": [
+        "skill gap 1",
+        "skill gap 2"
+    ],
+    "recruiter_action": "One clear recruiter action."
+}}
 
-For RECOMMENDED or CONSIDER, return:
-
-Recommendation: RECOMMENDED or CONSIDER
-
-Why: <one or two simple sentences>
-
-Strengths:
-- <strength 1>
-- <strength 2>
-
-Skill Gaps:
-- <skill gap 1>
-- <skill gap 2>
-
-Recruiter Action: <one clear action>
-
-For NOT RECOMMENDED, return:
-
-Recommendation: NOT RECOMMENDED
-
-Why: <one or two simple sentences>
-
-Recruiter Action: <one clear action>
-
-Important:
-- Do not invent information.
+Rules:
+- Recommendation must be RECOMMENDED.
+- Do not change the recommendation.
 - Use only the provided context.
-- Do not use Markdown.
-- Do not use * or **.
-- Keep the response simple and recruiter-friendly.
-- Do not include Strengths or Skill Gaps for NOT RECOMMENDED.
+- Do not invent information.
+- Keep the response simple.
+- Mention real candidate strengths.
+- Mention real skill gaps if available.
+- Return JSON only.
 
 Candidate and Job Context:
 
 {context}
 """)
 
-
 chain = prompt | llm
 
 
-# =========================
-# DATABASE
-# =========================
+def clean_response(text):
 
-db = SessionLocal()
+    text = str(text).strip()
 
-try:
+    if text.startswith("```"):
+        text = text.replace("```json", "")
+        text = text.replace("```", "")
+        text = text.strip()
 
-    # Only applications without recommendations
-    applications = (
-        db.query(JobApplication)
-        .filter(JobApplication.recommendation.is_(None))
-        .order_by(JobApplication.application_id)
-        .limit(100)
+    try:
+        return json.loads(text)
+
+    except Exception:
+        return {
+            "recommendation": "RECOMMENDED",
+            "why": text,
+            "strengths": [],
+            "skill_gaps": [],
+            "recruiter_action":
+                "Invite the candidate for an interview."
+        }
+
+
+def generate_ai_recommendations(db):
+
+    job_ids = (
+        db.query(JobApplication.job_id)
+        .distinct()
         .all()
     )
 
-    total = len(applications)
+    recommendations = []
 
-    print("Database connected!")
-    print("Processing:", total)
-    print("-" * 50)
+    for (job_id,) in job_ids:
 
+        applications = (
+            db.query(JobApplication)
+            .filter(
+                JobApplication.job_id == job_id
+            )
+            .order_by(
+                JobApplication.match_score.desc()
+            )
+            .all()
+        )
 
-    # =========================
-    # PROCESS APPLICATIONS
-    # =========================
+        if not applications:
+            continue
 
-    for index, application in enumerate(applications, 1):
+        ranked = []
 
-        try:
+        for application in applications:
 
-            print(
-                f"Processing {index}/{total} "
-                f"| Application ID: {application.application_id}"
+            match_score = float(
+                application.match_score or 0
             )
 
-            # Get candidate + job data
-            data = get_candidate_job_data(
-                application.candidate_id,
-                application.job_id
+            skill_score = float(
+                application.skill_match_percentage or 0
             )
 
-            if not data:
-                print("No candidate/job data found")
+            final_score = (
+                match_score * 50
+                + skill_score * 0.5
+            )
+
+            ranked.append(
+                (
+                    application,
+                    final_score
+                )
+            )
+
+        ranked.sort(
+            key=lambda x: x[1],
+            reverse=True
+        )
+
+        top_5 = ranked[:5]
+
+        for rank, (application, final_score) in enumerate(
+            top_5,
+            start=1
+        ):
+
+            application.ranking = rank
+
+            # Already processed
+            if application.recommendation:
+
+                try:
+                    recommendation = json.loads(
+                        application.recommendation
+                    )
+                except Exception:
+                    recommendation = {
+                        "recommendation":
+                            "RECOMMENDED",
+                        "why":
+                            application.recommendation
+                    }
+
+                recommendations.append({
+                    "application_id":
+                        application.application_id,
+                    "candidate_id":
+                        application.candidate_id,
+                    "job_id":
+                        application.job_id,
+                    "ranking":
+                        rank,
+                    "recommendation":
+                        recommendation
+                })
+
                 continue
 
-            # Build RAG context
-            context = build_rag_context(data)
+            try:
 
-            # Send to Groq
-            response = chain.invoke({
-                "context": context
-            })
-
-            # Get Groq response
-            recommendation = response.content
-
-            if isinstance(recommendation, list):
-                recommendation = "".join(
-                    item.get("text", "")
-                    for item in recommendation
-                    if isinstance(item, dict)
+                data = get_candidate_job_data(
+                    application.candidate_id,
+                    application.job_id
                 )
 
-            recommendation = str(recommendation).strip()
+                if not data:
+                    continue
 
-            # Store in database
-            application.recommendation = recommendation
+                context = build_rag_context(data)
 
-            db.commit()
+                response = chain.invoke({
+                    "context": context
+                })
 
-            print("Stored successfully")
-            print("-" * 50)
+                result = clean_response(
+                    response.content
+                )
 
+                result["recommendation"] = "RECOMMENDED"
 
-        except Exception as e:
+                application.recommendation = json.dumps(
+                    result,
+                    ensure_ascii=False
+                )
 
-            db.rollback()
+                db.commit()
 
-            print(
-                f"Error at application "
-                f"{application.application_id}: {e}"
-            )
+                recommendations.append({
+                    "application_id":
+                        application.application_id,
+                    "candidate_id":
+                        application.candidate_id,
+                    "job_id":
+                        application.job_id,
+                    "ranking":
+                        rank,
+                    "recommendation":
+                        result
+                })
 
+                time.sleep(1)
 
-    print("Completed.")
-    print("Recommendations stored in database.")
+            except Exception as e:
 
+                db.rollback()
 
-finally:
+                print(
+                    f"Error in Application "
+                    f"{application.application_id}: {e}"
+                )
 
-    db.close()
+                continue
+
+    return {
+        "message":
+            "AI recommendations generated successfully",
+        "total":
+            len(recommendations),
+        "recommendations":
+            recommendations
+    }
