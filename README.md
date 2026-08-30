@@ -1,176 +1,353 @@
+Yes. If this is for your **actual GitHub README**, it is better not to say “planned” for things you already implemented. Here is a simpler version describing what you actually did.
+
 # AI Recruitment Platform
 
-The AI Recruitment Platform is designed to help recruiters analyze resumes and job descriptions and identify suitable candidates using AI-based techniques.
-The system works with both existing candidates from a dataset and new candidates whose resumes are uploaded as PDF files.
+The **AI Recruitment Platform** helps recruiters find suitable candidates for a job by analyzing resumes, skills, job requirements, match scores, and candidate rankings.
 
-# The platform will automate tasks such as:
+The system works with candidates already available in the database and also supports uploading new resumes as PDF files.
 
-Resume screening
-Candidate profiling
-Job description analysis
-Candidate-job matching
-Skill-gap analysis
-Candidate ranking
-AI-based hiring recommendations
+## What the Platform Does
 
-# Technology Stack
-Python – Used to develop the main logic of the project.
-FastAPI – Used to create the backend APIs.
-Pandas – Used to process and manage data.
-PyPDF – Used to extract text from resume PDF files.
-SQLAlchemy – Used to define database models and communicate with PostgreSQL.
-Psycopg2-binary – Used as the PostgreSQL database driver.give i
-Python-dotenv – Used to load environment variables from .env.
-Pydantic – Used to validate API request and response data.
-Cloudinary - Stores uploaded resume files
-LangChain – Used later for LLM and RAG workflow.
-LLM (Grok) – Used later to analyze resumes and job descriptions.
-Semantic Search – Finds the most relevant candidates for a job using TF-IDF and Cosine Similarity.
-RAG – Used later to retrieve relevant information before generating AI recommendations.
-PostgreSQL – Used to store candidate and job information.
-Next.js – Used to create the frontend.
+* Uploads and stores resumes
+* Extracts candidate information from resumes
+* Extracts candidate skills
+* Stores candidate and job information in PostgreSQL
+* Matches candidates with jobs
+* Calculates candidate-job match scores
+* Finds matched and missing skills
+* Calculates skill match percentage
+* Ranks candidates for each job
+* Retrieves candidate and job information for AI analysis
+* Creates RAG context from the retrieved information
+* Generates AI hiring recommendations
 
-#  Database Schema
+## Technology Used
 
-The database schema was designed to store and manage:
+* **Python** – Main programming language
+* **FastAPI** – Creates backend APIs
+* **Pandas** – Data processing
+* **PyPDF** – Extracts text from PDF resumes
+* **SQLAlchemy** – Connects Python with PostgreSQL
+* **Psycopg2-binary** – PostgreSQL database driver
+* **Pydantic** – Validates API data
+* **Python-dotenv** – Loads environment variables
+* **Cloudinary** – Stores uploaded resumes
+* **PostgreSQL** – Stores candidates, jobs, applications and recommendations
+* **Scikit-learn** – Machine learning
+* **TF-IDF** – Converts text into numerical values
+* **Cosine Similarity** – Compares candidate and job information
+* **Random Forest Regressor** – Predicts match scores
+* **Joblib** – Saves and loads the ML model
+* **LangChain** – Used for the RAG and LLM workflow
+* **Grok LLM** – Generates AI-based hiring recommendations
+* **Next.js** – Frontend
 
-* Candidate information
-* Resume information
-* Skills
+## Database
+
+PostgreSQL is used to store:
+
+* Candidates
 * Candidate skills
-* Job information
+* Jobs
 * Job skills
-* Applications
+* Job applications
+* Match scores
+* Recommendations
+
+Database name:
+
+```text
+ai_recruitment
+```
+
+The database details are stored in the `.env` file.
+
+The `.env` file is not uploaded to GitHub.
+
+## Resume Upload and Candidate Profiling
+
+When a recruiter uploads a resume:
+
+```text
+Resume PDF
+    ↓
+Extract Resume Text
+    ↓
+Candidate Profiling
+    ↓
+Extract Candidate Information
+    ↓
+Extract Skills
+    ↓
+Store in PostgreSQL
+```
+
+The uploaded resume is stored in **Cloudinary**.
+
+The candidate profile contains information such as:
+
+* Name
+* Email
+* Education
+* Experience
+* Skills
+* Positions
+* Languages
+* Responsibilities
+
+## Machine Learning
+
+A machine learning model is used to calculate the candidate-job match score.
+
+The process is:
+
+```text
+Resume + Job Data
+       ↓
+Data Preprocessing
+       ↓
+Combine Candidate and Job Text
+       ↓
+TF-IDF
+       ↓
+Random Forest Regressor
+       ↓
+Predict Match Score
+```
+
+The trained model and TF-IDF vectorizer are saved using Joblib.
+
+```text
+model.pkl
+vectorizer.pkl
+```
+
+## Semantic Search
+
+Semantic search is used to find candidates who are more relevant to a particular job.
+
+It compares candidate information with job information using:
+
+**TF-IDF + Cosine Similarity**
+
+```text
+Job Description
+       ↓
+Compare with Candidates
+       ↓
+Cosine Similarity
+       ↓
+Find Relevant Candidates
+```
+
+## Candidate Matching
+
+After finding relevant candidates, the system calculates the ML match score for the candidate and job.
+
+```text
+Candidate
+    +
+Job
+    ↓
+ML Model
+    ↓
+Match Score
+```
+
+## Skill Gap Analysis
+
+The system compares the candidate's skills with the skills required for the job.
+
+It identifies:
+
+* Matched skills
+* Missing skills
+* Skill match percentage
+
+```text
+Candidate Skills
+       +
+Job Required Skills
+       ↓
+Skill Gap Analysis
+       ↓
+Matched Skills
+Missing Skills
+Skill Match %
+```
+
+## Candidate Ranking
+
+Candidates are ranked based on their matching results.
+
+```text
+Match Score
+     +
+Skill Match
+     ↓
+Final Score
+     ↓
+Candidate Ranking
+```
+
+The candidates with better scores are ranked higher for the job.
+
+## AI Retrieval
+
+The `ai_retrieval.py` file retrieves the required information from the database for AI analysis.
+
+It retrieves information such as:
+
+* Candidate details
+* Candidate skills
+* Job details
+* Job skills
+* Application details
 * Match results
 
-# Virtual Environment
+```text
+Candidate + Job
+      ↓
+AI Retrieval
+      ↓
+Relevant Information
+```
 
-A Python virtual environment was created for the project.
+## RAG Context
 
-python -m venv venv
+The `rag_context.py` file uses the retrieved information and creates a context for the AI model.
 
-Activate it on Windows:
+```text
+Candidate Information
+        +
+Job Information
+        +
+Skills
+        +
+Match Results
+        +
+Skill Gap
+        ↓
+RAG Context
+```
 
-venv\Scripts\activate
+This context is given to the Grok LLM to generate the recommendation.
 
-# PostgreSQL Database
+## AI Hiring Recommendation
 
-A PostgreSQL database named: ai_recruitment was created.
+The AI recommendation system uses the candidate and job information, match score, skill gap, ranking, and RAG context to generate a hiring recommendation.
 
-The database configuration is stored in .env.
+The recommendations are:
 
-POSTGRES_HOST=localhost
-POSTGRES_PORT=5432
-POSTGRES_DB=ai_recruitment
-POSTGRES_USER=postgres
-POSTGRES_PASSWORD=your_password
+* **RECOMMENDED** – Candidate is a good match
+* **CONSIDER** – Candidate needs further review
+* **NOT RECOMMENDED** – Candidate is not a suitable match
 
-The .env file is not uploaded to GitHub.
+The recommendation is stored in the job application record in the database.
 
-# Install dependcies
-fastapi             → Backend API
-uvicorn             → Run FastAPI server
-pandas               → Data processing
-pypdf                → Extract text from resume PDFs
-sqlalchemy           → Handles database operations
-psycopg2-binary      → Communicates with PostgreSQL
-python-dotenv        → Read .env variables
-langchain            → Builds LLM and RAG workflow
-llm                  →  grok
-Joblib               → Save and load trained ML models
+### AI Recommendation Flow
 
-# Machine Learning
+```text
+Candidate Ranking
+       ↓
+AI Retrieval
+       ↓
+Retrieve Candidate + Job Data
+       ↓
+RAG Context
+       ↓
+Grok LLM
+       ↓
+AI Recommendation
+       ↓
+RECOMMENDED
+CONSIDER
+NOT RECOMMENDED
+```
 
-- Scikit-learn – Machine Learning algorithms
-- TF-IDF – Converts resume and job text into numerical features
-- Random Forest Regressor – Predicts candidate-job match scores
-- Joblib – Saves and loads trained ML models
+## Complete Workflow
 
-# AI / NLP
+```text
+Candidates / Resume Upload
+          ↓
+   Candidate Profiling
+          ↓
+    Extract Skills
+          ↓
+     Job Details
+          ↓
+    Semantic Search
+          ↓
+ Find Relevant Candidates
+          ↓
+  Candidate-Job Matching
+          ↓
+    ML Match Score
+          ↓
+   Skill Gap Analysis
+          ↓
+Matched + Missing Skills
+          ↓
+    Final Score
+          ↓
+  Candidate Ranking
+          ↓
+    AI Retrieval
+          ↓
+    RAG Context
+          ↓
+      Grok LLM
+          ↓
+ AI Hiring Recommendation
+          ↓
+RECOMMENDED / CONSIDER / NOT RECOMMENDED
+```
 
--LangChain – LLM and RAG workflow
-- Grok LLM – Planned AI analysis
-- Semantic Search – Used to find the most relevant candidates for a particular job based on the similarity between job and candidate information.
-- TF-IDF + Cosine Similarity – Used for semantic-style similarity search between job descriptions and candidate profiles.
-- RAG – Planned retrieval-based AI recommendations
+## Backend Structure
 
-# Backend Structure
+```text
 backend/
 │
 ├── database.py
 ├── models.py
 ├── create_tables.py
 │
-├── upload_resume.py       # Uploads PDF resumes to Cloudinary
-├── candidate_profiling.py # Extracts candidate information and skills
-├── candidate_matching.py  # Calculates ML match scores for all candidates and jobs
-├── predict_match.py       # Predicts match score for a candidate-job pair
-├── semantic_search.py     # Finds top relevant candidates using similarity
-├── skill_gap.py           # Finds matched and missing skills
-├── ranking.py             # Calculates final score and ranks candidates
+├── upload_resume.py
+├── candidate_profiling.py
+├── candidate_matching.py
+├── predict_match.py
+├── semantic_search.py
+├── skill_gap.py
+├── ranking.py
+├── ai_retrieval.py
+├── rag_context.py
+├── ai_recommendation.py
 │
-├── preprocess.py          # Loads dataset into the database
-├── explore_data.py        # Explores the dataset
-├── train.py               # Trains the ML model
-├── test.py                # Tests the ML model
+├── preprocess.py
+├── explore_data.py
+├── train.py
+├── test.py
 │
-├── model.pkl              # Trained Random Forest model
-├── vectorizer.pkl         # Trained TF-IDF vectorizer
-├── test_data.csv          # Test data
+├── model.pkl
+├── vectorizer.pkl
+├── test_data.csv
 │
-└── .env                   # Database and Cloudinary configuration
+└── .env
+```
 
-# Machine Learning Workflow
+## FastAPI
 
-The current ML workflow is:
+FastAPI is used to create the backend APIs.
 
-Resume + Job Dataset
-        ↓
-Data Preprocessing
-        ↓
-Select Candidate + Job Information
-        ↓
-Combine Candidate + Job Text
-        ↓
-Train / Test Split
-        ↓
-TF-IDF Vectorization
-        ↓
-Random Forest Regressor
-        ↓
-Train Model
-        ↓
-Save Model + Vectorizer
-        ↓
-Test Model
-        ↓
-Predict Match Scores
-        ↓
-MAE / MSE / R² Evaluation
+The APIs are used for operations such as:
 
-# Candidate Matching and Intelligence Workflow
-Existing Candidates + New Resume Uploads
-                  ↓
-           Candidate Profiling
-                  ↓
-        Extract Candidate Skills
-                  ↓
-            Job Description
-                  ↓
-          Semantic Search
-                  ↓
-      Find Top Relevant Candidates
-                  ↓
-        Candidate-Job Matching
-                  ↓
-       Calculate ML Match Score
-                  ↓
-         Skill Gap Analysis
-                  ↓
-   Identify Matched + Missing Skills
-                  ↓
-          Calculate Final Score
-                  ↓
-         Candidate Ranking
-                  ↓
-      Rank Best Candidates for Job
+* Uploading resumes
+* Getting candidates
+* Getting jobs
+* Getting applications
+* Processing candidate information
+* Working with the recruitment system
+
+Swagger UI is used to test the APIs.
+
+This version is intentionally **simple and factual**—it describes what you have actually built without adding extra features you haven't implemented.
