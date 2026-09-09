@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import FastAPI, Depends, UploadFile, File, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -355,7 +355,6 @@ def google_login(
 @app.post("/forgot-password")
 def forgot_password(
     data: ForgotPasswordRequest,
-    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     user = db.query(User).filter(
@@ -379,7 +378,6 @@ def forgot_password(
     )
 
     user.reset_otp = otp
-
     db.commit()
 
     subject = "AI Recruitment - Password Reset OTP"
@@ -401,16 +399,28 @@ Regards,
 AI Recruitment Platform
 """
 
-    background_tasks.add_task(
-        send_email,
-        user.email,
-        subject,
-        message
-    )
+    try:
+        send_email(
+            user.email,
+            subject,
+            message
+        )
 
-    return {
-        "message": "Password reset OTP sent to your email."
-    }
+        return {
+            "message": "Password reset OTP sent to your email."
+        }
+
+    except Exception as e:
+        db.rollback()
+
+        print(
+            f"PASSWORD RESET EMAIL ERROR: {e}"
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to send OTP email. Please try again."
+        )
 
 
 @app.post("/reset-password")
