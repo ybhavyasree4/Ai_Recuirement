@@ -12,7 +12,6 @@ import {
   faIdBadge,
   faBriefcase,
   faChartLine,
-  faCheckCircle,
 } from "@fortawesome/free-solid-svg-icons";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
@@ -92,27 +91,11 @@ export default function Shortlisted() {
       : `${n.toFixed(2)}%`;
   }
 
-  function skillScore(value) {
-    const n = Number(value);
-
-    if (
-      value === null ||
-      value === undefined ||
-      isNaN(n)
-    ) {
-      return "N/A";
-    }
-
-    return `${n.toFixed(2)}%`;
-  }
-
-  // SEARCH
   const filtered = candidates.filter((candidate) => {
     const q = search.trim().toLowerCase();
 
     if (!q) return true;
 
-    // Numeric search = exact Candidate ID
     if (/^\d+$/.test(q)) {
       return (
         String(candidate.candidate_id) === q
@@ -142,7 +125,6 @@ export default function Shortlisted() {
 
       <section className="flex-1 w-full max-w-[1600px] mx-auto p-5 sm:p-6 md:p-8 lg:p-10">
 
-        {/* BACK */}
         <Link
           href="/dashboard"
           className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 mb-5 transition text-sm"
@@ -151,7 +133,6 @@ export default function Shortlisted() {
           Back to Dashboard
         </Link>
 
-        {/* HEADER */}
         <p className="text-cyan-400 font-semibold text-xs sm:text-sm">
           RECRUITMENT
         </p>
@@ -164,7 +145,6 @@ export default function Shortlisted() {
           Candidates recommended by the AI system.
         </p>
 
-        {/* SEARCH */}
         <div className="relative w-full max-w-3xl mb-5">
 
           <FontAwesomeIcon
@@ -183,7 +163,6 @@ export default function Shortlisted() {
 
         </div>
 
-        {/* COUNT */}
         <p className="text-gray-400 text-sm mb-4">
           Shortlisted Candidates:{" "}
           <span className="text-white font-bold">
@@ -191,21 +170,18 @@ export default function Shortlisted() {
           </span>
         </p>
 
-        {/* LOADING */}
         {loading && (
           <p className="text-cyan-400 text-sm">
             Loading shortlisted candidates...
           </p>
         )}
 
-        {/* ERROR */}
         {error && (
           <p className="text-red-400 text-sm">
             {error}
           </p>
         )}
 
-        {/* CARDS */}
         {!loading &&
           !error &&
           filtered.length > 0 && (
@@ -219,7 +195,6 @@ export default function Shortlisted() {
                   className="bg-[#0b1020] rounded-xl p-4 sm:p-5 min-h-[320px] flex flex-col overflow-hidden"
                 >
 
-                  {/* TOP */}
                   <div className="flex items-center justify-between gap-2">
 
                     <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-full bg-cyan-400/10 flex items-center justify-center shrink-0">
@@ -237,12 +212,10 @@ export default function Shortlisted() {
 
                   </div>
 
-                  {/* CANDIDATE */}
                   <h2 className="text-base sm:text-lg font-bold mt-3 break-words">
                     Candidate #{candidate.candidate_id}
                   </h2>
 
-                  {/* INFORMATION */}
                   <div className="space-y-3 mt-4 flex-1 min-w-0">
 
                     <Info
@@ -266,17 +239,8 @@ export default function Shortlisted() {
                       highlight
                     />
 
-                    <Info
-                      icon={faCheckCircle}
-                      label="Skill Match"
-                      value={skillScore(
-                        candidate.skill_match_percentage
-                      )}
-                    />
-
                   </div>
 
-                  {/* BOTTOM */}
                   <div className="pt-3 mt-3 border-t border-white/5">
 
                     <p className="text-green-400 font-semibold text-xs sm:text-sm">
@@ -292,7 +256,6 @@ export default function Shortlisted() {
             </div>
           )}
 
-        {/* EMPTY */}
         {!loading &&
           !error &&
           filtered.length === 0 && (
@@ -323,10 +286,6 @@ export default function Shortlisted() {
     </main>
   );
 }
-
-/* =========================
-   NAVBAR
-========================= */
 
 function Navbar() {
   return (
@@ -376,10 +335,6 @@ function Navbar() {
   );
 }
 
-/* =========================
-   INFO
-========================= */
-
 function Info({
   icon,
   label,
@@ -415,10 +370,6 @@ function Info({
     </div>
   );
 }
-
-/* =========================
-   FOOTER
-========================= */
 
 function Footer() {
   return (
