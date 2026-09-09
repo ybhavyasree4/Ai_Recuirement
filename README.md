@@ -1,223 +1,198 @@
-Yes. If this is for your **actual GitHub README**, it is better not to say “planned” for things you already implemented. Here is a simpler version describing what you actually did.
-
 # AI Recruitment Platform
 
-The **AI Recruitment Platform** helps recruiters find suitable candidates for a job by analyzing resumes, skills, job requirements, match scores, and candidate rankings.
+The AI Recruitment Platform is an end-to-end web application designed to help recruiters automate and improve the candidate screening and selection process.
 
-The system works with candidates already available in the database and also supports uploading new resumes as PDF files.
+The platform analyzes resumes and job requirements to provide candidate profiles, job matching, skill-gap analysis, candidate ranking, and AI-powered hiring recommendations.
 
-## What the Platform Does
+# Project Description
 
-* Uploads and stores resumes
-* Extracts candidate information from resumes
-* Extracts candidate skills
-* Stores candidate and job information in PostgreSQL
-* Matches candidates with jobs
-* Calculates candidate-job match scores
-* Finds matched and missing skills
-* Calculates skill match percentage
-* Ranks candidates for each job
-* Retrieves candidate and job information for AI analysis
-* Creates RAG context from the retrieved information
-* Generates AI hiring recommendations
+This project develops an end-to-end AI-powered recruitment platform that automates:
 
-## Technology Used
+* Resume screening
+* Candidate profiling
+* Job matching
+* Skill-gap analysis
+* Candidate ranking
+* Candidate shortlisting
+* AI-based hiring recommendations
 
-* **Python** – Main programming language
-* **FastAPI** – Creates backend APIs
-* **Pandas** – Data processing
-* **PyPDF** – Extracts text from PDF resumes
-* **SQLAlchemy** – Connects Python with PostgreSQL
-* **Psycopg2-binary** – PostgreSQL database driver
-* **Pydantic** – Validates API data
-* **Python-dotenv** – Loads environment variables
-* **Cloudinary** – Stores uploaded resumes
-* **PostgreSQL** – Stores candidates, jobs, applications and recommendations
-* **Scikit-learn** – Machine learning
-* **TF-IDF** – Converts text into numerical values
-* **Cosine Similarity** – Compares candidate and job information
-* **Random Forest Regressor** – Predicts match scores
-* **Joblib** – Saves and loads the ML model
-* **LangChain** – Used for the RAG and LLM workflow
-* **Grok LLM** – Generates AI-based hiring recommendations
-* **Next.js** – Frontend
+The system uses Large Language Models (LLMs), semantic search, and Retrieval-Augmented Generation (RAG) to analyze candidate resumes and job descriptions and assist recruiters in making better hiring decisions.
 
-## Database
+# Project Overview
 
-PostgreSQL is used to store:
+The platform reduces the manual effort involved in resume screening and candidate selection.
 
-* Candidates
-* Candidate skills
-* Jobs
-* Job skills
-* Job applications
-* Match scores
-* Recommendations
+The main workflow is:
 
-Database name:
-
-```text
-ai_recruitment
-```
-
-The database details are stored in the `.env` file.
-
-The `.env` file is not uploaded to GitHub.
-
-## Resume Upload and Candidate Profiling
-
-When a recruiter uploads a resume:
-
-```text
-Resume PDF
+Recruiter
     ↓
-Extract Resume Text
+Next.js Frontend
     ↓
-Candidate Profiling
+FastAPI Backend
     ↓
-Extract Candidate Information
+PostgreSQL Database
     ↓
-Extract Skills
+Resume & Job Data
     ↓
-Store in PostgreSQL
-```
+Matching / Machine Learning
+    ↓
+Candidate Ranking
+    ↓
+AI / RAG Analysis
+    ↓
+Hiring Recommendation
 
-The uploaded resume is stored in **Cloudinary**.
 
-The candidate profile contains information such as:
+# Main Features
 
-* Name
-* Email
-* Education
-* Experience
-* Skills
-* Positions
-* Languages
-* Responsibilities
+# Recruiter Management
 
-## Machine Learning
+* Recruiter signup
+* Recruiter login
+* Recruiter dashboard
 
-A machine learning model is used to calculate the candidate-job match score.
+# Resume Processing
 
-The process is:
+* Resume upload
+* Resume text extraction
+* Candidate profiling
+* Candidate information extraction
+* Candidate skill extraction
+* Cloudinary resume storage
 
-```text
-Resume + Job Data
-       ↓
-Data Preprocessing
-       ↓
-Combine Candidate and Job Text
-       ↓
+# Job Management
+
+* Job management
+* Job requirement analysis
+* Required skill management
+
+# Candidate Matching
+
+* Candidate-job matching
+* Match score calculation
+* Semantic search
+* Skill-gap analysis
+* Candidate ranking
+
+# Recruitment Decision Support
+
+* Candidate shortlisting
+* AI-powered hiring recommendations
+* Recommendation categories such as:
+
+  * Recommended
+  * Consider
+  * Not Recommended
+
+# Data Management
+
+* Supabase,PostgreSQL database
+* Candidate data storage
+* Job data storage
+* Application data storage
+
+
+# Technology Stack
+
+# Frontend
+
+* Next.js
+* React
+* JavaScript
+* Font Awesome
+* Tailwind CSS
+
+# Backend
+
+* Python
+* FastAPI
+* SQLAlchemy
+* Pydantic
+* Pandas
+* PyPDF
+* Psycopg2
+* Python-dotenv
+
+# Database
+
+* PostgreSQL
+
+# Machine Learning
+
+* Scikit-learn
+* TF-IDF
+* Cosine Similarity
+* Random Forest Regressor
+* Joblib
+
+# Generative AI
+
+* LangChain
+* Groq LLM
+* Google Gemini
+* Retrieval-Augmented Generation (RAG)
+
+# File Storage
+
+* Cloudinary
+
+
+# AI and Machine Learning
+
+The platform combines traditional machine learning techniques with Generative AI.
+
+# Resume and Job Matching
+
+Resume and job information is processed to calculate candidate-job similarity.
+
+The system uses:
+Resume Data
+     +
+Job Requirements
+     ↓
+Text Preprocessing
+     ↓
 TF-IDF
-       ↓
-Random Forest Regressor
-       ↓
-Predict Match Score
-```
+     ↓
+Cosine Similarity / ML Model
+     ↓
+Match Score
 
-The trained model and TF-IDF vectorizer are saved using Joblib.
 
-```text
-model.pkl
-vectorizer.pkl
-```
+# Candidate Ranking
 
-## Semantic Search
+Candidates are ranked according to their matching scores for the selected job.
 
-Semantic search is used to find candidates who are more relevant to a particular job.
-
-It compares candidate information with job information using:
-
-**TF-IDF + Cosine Similarity**
-
-```text
-Job Description
-       ↓
-Compare with Candidates
-       ↓
-Cosine Similarity
-       ↓
-Find Relevant Candidates
-```
-
-## Candidate Matching
-
-After finding relevant candidates, the system calculates the ML match score for the candidate and job.
-
-```text
-Candidate
-    +
-Job
-    ↓
-ML Model
+Candidates
     ↓
 Match Score
-```
+    ↓
+Sorting
+    ↓
+Candidate Ranking
 
-## Skill Gap Analysis
 
-The system compares the candidate's skills with the skills required for the job.
+### Skill-Gap Analysis
 
-It identifies:
+The system compares candidate skills with the skills required for a job.
 
-* Matched skills
-* Missing skills
-* Skill match percentage
-
-```text
 Candidate Skills
        +
-Job Required Skills
+Required Job Skills
        ↓
-Skill Gap Analysis
+Skill Comparison
        ↓
 Matched Skills
+       +
 Missing Skills
-Skill Match %
-```
+       ↓
+Skill Gap
 
-## Candidate Ranking
 
-Candidates are ranked based on their matching results.
+## AI Hiring Recommendation
 
-```text
-Match Score
-     +
-Skill Match
-     ↓
-Final Score
-     ↓
-Candidate Ranking
-```
+The platform uses an LLM and RAG-based workflow to analyze relevant candidate and job information and generate a hiring recommendation.
 
-The candidates with better scores are ranked higher for the job.
-
-## AI Retrieval
-
-The `ai_retrieval.py` file retrieves the required information from the database for AI analysis.
-
-It retrieves information such as:
-
-* Candidate details
-* Candidate skills
-* Job details
-* Job skills
-* Application details
-* Match results
-
-```text
-Candidate + Job
-      ↓
-AI Retrieval
-      ↓
-Relevant Information
-```
-
-## RAG Context
-
-The `rag_context.py` file uses the retrieved information and creates a context for the AI model.
-
-```text
 Candidate Information
         +
 Job Information
@@ -225,129 +200,215 @@ Job Information
 Skills
         +
 Match Results
-        +
-Skill Gap
         ↓
 RAG Context
-```
+        ↓
+LLM
+        ↓
+AI Hiring Recommendation
 
-This context is given to the Grok LLM to generate the recommendation.
 
-## AI Hiring Recommendation
+# System Architecture
 
-The AI recommendation system uses the candidate and job information, match score, skill gap, ranking, and RAG context to generate a hiring recommendation.
+                       Recruiter
+                           |
+                           v
+                  Next.js Frontend
+                           |
+                           v
+                    FastAPI Backend
+                           |
+              +------------+-------------+
+              |            |             |
+              v            v             v
+         PostgreSQL     ML Model      AI / RAG
+              |            |             |
+              |            v             v
+              |        Match Score   Recommendation
+              |
+              v
+       Candidate / Job /
+       Application Data
 
-The recommendations are:
 
-* **RECOMMENDED** – Candidate is a good match
-* **CONSIDER** – Candidate needs further review
-* **NOT RECOMMENDED** – Candidate is not a suitable match
+# Project Structure
 
-The recommendation is stored in the job application record in the database.
+AI_Recuirement/
+│
+├── frontend/
+│   ├── app/
+│   ├── components/
+│   ├── public/
+│   ├── package.json
+│   └── ...
+│
+├── backend/
+│   ├── main.py
+│   ├── database.py
+│   ├── models.py
+│   ├── schemas.py
+│   ├── upload_resume.py
+│   ├── candidate_profiling.py
+│   ├── ranking.py
+│   ├── skill_gap.py
+│   ├── ai_recommendation.py
+│   ├── ai_retrieval.py
+│   ├── rag_context.py
+│   ├── predict.py
+│   ├── model.pkl
+│   ├── vectorizer.pkl
+│   ├── requirements.txt
+│   └── ...
+│
+├── README.md
+└── ...
 
-### AI Recommendation Flow
+
+# Database
+Supabase (PostgreSQL)
+
+The application uses Supabase as the database platform. Supabase provides the PostgreSQL database used to store:
+
+Candidate information
+Candidate skills
+Job information
+Job skills
+Job applications
+Match scores
+Rankings
+AI recommendations
+
+# API
+
+The backend is implemented using FastAPI.
+
+Example endpoints include:
 
 ```text
-Candidate Ranking
-       ↓
-AI Retrieval
-       ↓
-Retrieve Candidate + Job Data
-       ↓
-RAG Context
-       ↓
-Grok LLM
-       ↓
-AI Recommendation
-       ↓
-RECOMMENDED
-CONSIDER
-NOT RECOMMENDED
+GET  /
+GET  /candidates
+GET  /jobs
+GET  /applications
+POST /upload-resume
 ```
 
-## Complete Workflow
+FastAPI also provides API documentation through Swagger UI.
+
+http://localhost:8000/docs
+
+
+# Setup and Installation
+
+# Backend
+
+Open a terminal and navigate to the backend folder:
+
+cd backend
+
+
+Create and activate a Python virtual environment:
+
+python -m venv venv
+
+
+Activate it on Windows:
+
+venv\Scripts\activate
+
+
+Install the required dependencies:
+
+
+pip install -r requirements.txt
+
+
+Run the FastAPI backend:
+
+
+uvicorn main:app --reload
+
+
+The backend will run on:
+
+http://localhost:8000
+
+
+Swagger API documentation:
+
+http://localhost:8000/docs
+
+
+## Frontend
+
+Navigate to the frontend folder:
+cd frontend
+
+Install dependencies:
+
+npm install
+
+Run the development server:
+
+
+npm run dev
+
+
+The frontend will normally run on:
 
 ```text
-Candidates / Resume Upload
-          ↓
-   Candidate Profiling
-          ↓
-    Extract Skills
-          ↓
-     Job Details
-          ↓
-    Semantic Search
-          ↓
- Find Relevant Candidates
-          ↓
-  Candidate-Job Matching
-          ↓
-    ML Match Score
-          ↓
-   Skill Gap Analysis
-          ↓
-Matched + Missing Skills
-          ↓
-    Final Score
-          ↓
-  Candidate Ranking
-          ↓
-    AI Retrieval
-          ↓
-    RAG Context
-          ↓
-      Grok LLM
-          ↓
- AI Hiring Recommendation
-          ↓
-RECOMMENDED / CONSIDER / NOT RECOMMENDED
+http://localhost:3000
 ```
 
-## Backend Structure
+---
 
-```text
-backend/
-│
-├── database.py
-├── models.py
-├── create_tables.py
-│
-├── upload_resume.py
-├── candidate_profiling.py
-├── candidate_matching.py
-├── predict_match.py
-├── semantic_search.py
-├── skill_gap.py
-├── ranking.py
-├── ai_retrieval.py
-├── rag_context.py
-├── ai_recommendation.py
-│
-├── preprocess.py
-├── explore_data.py
-├── train.py
-├── test.py
-│
-├── model.pkl
-├── vectorizer.pkl
-├── test_data.csv
-│
-└── .env
-```
+# Environment Variables
 
-## FastAPI
+API keys and database credentials should be stored in a `.env` file.
 
-FastAPI is used to create the backend APIs.
+Example:
 
-The APIs are used for operations such as:
+DATABASE_URL=your_database_connection
+GROQ_API_KEY=your_groq_api_key
+GOOGLE_API_KEY=your_google_api_key
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
 
-* Uploading resumes
-* Getting candidates
-* Getting jobs
-* Getting applications
-* Processing candidate information
-* Working with the recruitment system
+# End-to-End Workflow
 
-Swagger UI is used to test the APIs.
 
-This version is intentionally **simple and factual**—it describes what you have actually built without adding extra features you haven't implemented.
+1. Recruiter logs into the platform
+             ↓
+2. Recruiter uploads a resume
+             ↓
+3. Resume text is extracted
+             ↓
+4. Candidate profile is generated
+             ↓
+5. Candidate skills are extracted
+             ↓
+6. Candidate is compared with job requirements
+             ↓
+7. Match score is calculated
+             ↓
+8. Skill gaps are identified
+             ↓
+9. Candidates are ranked
+             ↓
+10. Relevant candidate/job information is retrieved
+             ↓
+11. RAG context is created
+             ↓
+12. LLM generates hiring recommendation
+             ↓
+13. Recruiter reviews the recommendation
+             ↓
+14. Recruiter can shortlist suitable candidates
+
+
+
+# Objective
+
+The main objective of this project is to build an intelligent recruitment system that can reduce manual resume screening effort and provide recruiters with data-driven and AI-assisted candidate evaluation.
+
+The platform combines web development, machine learning, semantic matching, LLMs, and RAG into a single recruitment workflow.

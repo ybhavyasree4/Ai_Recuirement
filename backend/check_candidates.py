@@ -1,19 +1,10 @@
-import os
-from dotenv import load_dotenv
-from groq import Groq
+import bcrypt
 
-load_dotenv()
+password = "bhavyasreey"
 
-try:
-    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+hashed = bcrypt.hashpw(
+    password.encode("utf-8"),
+    bcrypt.gensalt()
+).decode("utf-8")
 
-    response = client.chat.completions.create(
-        model="openai/gpt-oss-120b",
-        messages=[{"role": "user", "content": "Say OK"}],
-        max_tokens=100
-    )
-
-    print("GROQ WORKING" if response.choices[0].message.content else "GROQ NOT WORKING")
-
-except Exception:
-    print("GROQ NOT WORKING")
+print(hashed)

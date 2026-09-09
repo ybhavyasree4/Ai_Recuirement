@@ -1,14 +1,19 @@
-import joblib
-import numpy as np
+from semantic_search import get_similarity
 
-from models import Candidate, Job, CandidateSkill, JobSkill, JobApplication
-
-model = joblib.load("model.pkl")
-vectorizer = joblib.load("vectorizer.pkl")
+from models import (
+    Candidate,
+    Job,
+    CandidateSkill,
+    JobSkill,
+    JobApplication
+)
 
 
 def text(*values):
-    return " ".join(str(v or "").strip() for v in values)
+    return " ".join(
+        str(v or "").strip()
+        for v in values
+    )
 
 
 def match_candidate(db, candidate_id):
@@ -20,7 +25,9 @@ def match_candidate(db, candidate_id):
     if not candidate:
         return None
 
-    jobs = db.query(Job).order_by(Job.job_id).all()
+    jobs = db.query(Job).order_by(
+        Job.job_id
+    ).all()
 
     if not jobs:
         return []
@@ -35,9 +42,16 @@ def match_candidate(db, candidate_id):
 
     job_skills = {}
 
-    for s in db.query(JobSkill).all():
-        if s.skill_name:
-            job_skills.setdefault(s.job_id, []).append(s.skill_name)
+    for skill in db.query(JobSkill).all():
+
+        if skill.skill_name:
+
+            job_skills.setdefault(
+                skill.job_id,
+                []
+            ).append(
+                skill.skill_name
+            )
 
     candidate_text = text(
         candidate.career_objective,
@@ -52,48 +66,43 @@ def match_candidate(db, candidate_id):
         *candidate_skills
     )
 
-    combined_texts = []
-    job_ids = []
+    results = []
 
     for job in jobs:
+
         job_text = text(
             job.job_position_name,
             job.educationaL_requirements,
             job.experiencere_requirement,
             job.responsibilities,
-            *job_skills.get(job.job_id, [])
+            *job_skills.get(
+                job.job_id,
+                []
+            )
         )
 
-        combined_texts.append(
-            job_text + " " + candidate_text
+        score = get_similarity(
+            candidate_text,
+            job_text
         )
 
-        job_ids.append(job.job_id)
-
-    vectors = vectorizer.transform(combined_texts)
-
-    scores = np.clip(
-        model.predict(vectors),
-        0,
-        1
-    )
-
-    results = []
-
-    for job_id, score in zip(job_ids, scores):
-
-        application = db.query(JobApplication).filter(
+        application = db.query(
+            JobApplication
+        ).filter(
             JobApplication.candidate_id == candidate_id,
-            JobApplication.job_id == job_id
+            JobApplication.job_id == job.job_id
         ).first()
 
         if application:
-            application.match_score = float(score)
+
+            application.match_score = score
+
         else:
+
             application = JobApplication(
                 candidate_id=candidate_id,
-                job_id=job_id,
-                match_score=float(score),
+                job_id=job.job_id,
+                match_score=score,
                 skill_match_percentage=0,
                 matched_skills="",
                 missing_skills="",
@@ -101,16 +110,16 @@ def match_candidate(db, candidate_id):
                 recommendation="Pending Analysis",
                 application_status="Applied"
             )
+
             db.add(application)
 
-        job = db.query(Job).filter(
-            Job.job_id == job_id
-        ).first()
-
         results.append({
-            "job_id": job_id,
+            "job_id": job.job_id,
             "job_title": job.job_position_name,
-            "match_score": round(float(score) * 100, 2)
+            "match_score": round(
+                score * 100,
+                2
+            )
         })
 
     db.commit()
