@@ -28,10 +28,7 @@ export default function Applications() {
   useEffect(() => {
     fetch(`${API_URL}/applications`)
       .then((res) => {
-        if (!res.ok) {
-          throw new Error();
-        }
-
+        if (!res.ok) throw new Error();
         return res.json();
       })
       .then((data) => {
@@ -52,20 +49,28 @@ export default function Applications() {
   }, []);
 
   useEffect(() => {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }, [selected]);
 
   function openApplication(app) {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
     setSelected(app);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 
   function backToApplications() {
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
     setSelected(null);
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   }
 
   function score(value) {
@@ -101,9 +106,7 @@ export default function Applications() {
   const filtered = applications.filter((app) => {
     const q = search.trim().toLowerCase();
 
-    if (!q) {
-      return true;
-    }
+    if (!q) return true;
 
     if (/^\d+$/.test(q)) {
       return String(app.application_id) === q;
@@ -125,35 +128,39 @@ export default function Applications() {
     return text.includes(q);
   });
 
+  /* =========================
+     APPLICATION DETAILS
+  ========================= */
+
   if (selected) {
     return (
-      <main className="min-h-screen bg-[#050816] text-white pb-16">
+      <main className="min-h-screen bg-[#050816] text-white flex flex-col overflow-x-hidden">
         <Navbar />
 
-        <section className="p-6 md:p-10">
+        <section className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 pb-12">
           <button
             onClick={backToApplications}
-            className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 mb-6"
+            className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 mb-5 text-sm transition"
           >
             <FontAwesomeIcon icon={faArrowLeft} />
             Back to Applications
           </button>
 
           <div className="mb-6">
-            <p className="text-cyan-400 font-semibold">
+            <p className="text-cyan-400 text-xs sm:text-sm font-semibold">
               APPLICATION ID: {selected.application_id}
             </p>
 
-            <h1 className="text-3xl md:text-4xl font-bold mt-2">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mt-1.5 break-words">
               Application Details
             </h1>
 
-            <p className="text-gray-400 mt-2">
+            <p className="text-gray-400 text-sm sm:text-base mt-1.5">
               Candidate and job application information
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Section
               icon={faUser}
               title="Candidate"
@@ -173,7 +180,7 @@ export default function Applications() {
               icon={faChartLine}
               title="Match Score"
             >
-              <p className="text-3xl font-bold text-cyan-400">
+              <p className="text-2xl sm:text-3xl font-bold text-cyan-400">
                 {score(selected.match_score)}
               </p>
             </Section>
@@ -182,7 +189,7 @@ export default function Applications() {
               icon={faCheckCircle}
               title="Skill Match"
             >
-              <p className="text-3xl font-bold text-cyan-400">
+              <p className="text-2xl sm:text-3xl font-bold text-cyan-400">
                 {skillScore(
                   selected.skill_match_percentage
                 )}
@@ -193,7 +200,7 @@ export default function Applications() {
               icon={faChartLine}
               title="Ranking"
             >
-              <p className="text-3xl font-bold">
+              <p className="text-2xl sm:text-3xl font-bold">
                 #{selected.ranking ?? "N/A"}
               </p>
             </Section>
@@ -207,7 +214,7 @@ export default function Applications() {
             </Section>
           </div>
 
-          <div className="mt-5">
+          <div className="mt-4">
             <Section
               icon={faLightbulb}
               title="AI Recommendation"
@@ -219,7 +226,7 @@ export default function Applications() {
             </Section>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mt-5">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
             <Section
               icon={faCheckCircle}
               title="Matched Skills"
@@ -247,40 +254,40 @@ export default function Applications() {
     );
   }
 
+  /* =========================
+     APPLICATION LIST
+  ========================= */
+
   return (
-    <main className="min-h-screen bg-[#050816] text-white pb-16">
+    <main className="min-h-screen bg-[#050816] text-white flex flex-col overflow-x-hidden">
       <Navbar />
 
-      <section className="p-6 md:p-10">
+      <section className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 pb-12">
         <Link
           href="/dashboard"
           scroll={true}
-          onClick={() => {
-            document.documentElement.scrollTop = 0;
-            document.body.scrollTop = 0;
-          }}
-          className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 mb-6"
+          className="flex items-center gap-2 text-gray-400 hover:text-cyan-400 mb-5 text-sm transition"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
           Back to Dashboard
         </Link>
 
-        <p className="text-cyan-400 font-semibold">
+        <p className="text-cyan-400 text-xs sm:text-sm font-semibold">
           TALENTIQ
         </p>
 
-        <h1 className="text-4xl font-bold mt-2">
+        <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mt-1.5">
           Applications
         </h1>
 
-        <p className="text-gray-400 text-lg mt-2 mb-6">
+        <p className="text-gray-400 text-sm sm:text-base mt-1.5 mb-5">
           View and analyze candidate applications.
         </p>
 
-        <div className="relative max-w-3xl mb-6">
+        <div className="relative w-full max-w-3xl mb-5">
           <FontAwesomeIcon
             icon={faMagnifyingGlass}
-            className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 text-sm"
           />
 
           <input
@@ -289,18 +296,18 @@ export default function Applications() {
               setSearch(e.target.value)
             }
             placeholder="Search by Application ID, status, skills or recommendation"
-            className="w-full bg-[#0b1020] rounded-lg py-4 pl-11 pr-4 text-lg outline-none"
+            className="w-full bg-[#0b1020] rounded-lg py-3 pl-10 pr-3 text-sm text-white outline-none focus:ring-2 focus:ring-cyan-400/30"
           />
         </div>
 
         {loading && (
-          <p className="text-cyan-400">
+          <p className="text-cyan-400 text-sm">
             Loading applications...
           </p>
         )}
 
         {error && (
-          <p className="text-red-400">
+          <p className="text-red-400 text-sm">
             {error}
           </p>
         )}
@@ -308,24 +315,24 @@ export default function Applications() {
         {!loading &&
           !error &&
           filtered.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 items-stretch">
               {filtered.map((app) => (
                 <div
                   key={app.application_id}
-                  className="bg-[#0b1020] rounded-xl p-5"
+                  className="bg-[#0b1020] rounded-xl p-4 min-h-[290px] h-full flex flex-col overflow-hidden"
                 >
-                  <div className="flex justify-between items-center mb-5">
-                    <p className="text-cyan-400 font-semibold">
+                  <div className="flex justify-between items-center gap-2 mb-4 min-w-0">
+                    <p className="text-cyan-400 text-xs sm:text-sm font-semibold break-words">
                       Application #{app.application_id}
                     </p>
 
                     <FontAwesomeIcon
                       icon={faBriefcase}
-                      className="text-cyan-400"
+                      className="text-cyan-400 text-sm shrink-0"
                     />
                   </div>
 
-                  <div className="space-y-5">
+                  <div className="space-y-3 flex-1 min-w-0">
                     <Info
                       icon={faUser}
                       label="Candidate ID"
@@ -341,9 +348,7 @@ export default function Applications() {
                     <Info
                       icon={faChartLine}
                       label="Match Score"
-                      value={score(
-                        app.match_score
-                      )}
+                      value={score(app.match_score)}
                       highlight
                     />
 
@@ -363,8 +368,10 @@ export default function Applications() {
                   </div>
 
                   <button
-                    onClick={() => openApplication(app)}
-                    className="w-full py-3 mt-6 rounded-lg bg-cyan-400/10 text-cyan-400 hover:bg-cyan-400 hover:text-black font-semibold"
+                    onClick={() =>
+                      openApplication(app)
+                    }
+                    className="w-full py-2.5 mt-4 rounded-lg bg-cyan-400/10 text-cyan-400 hover:bg-cyan-400 hover:text-black text-xs sm:text-sm font-semibold transition"
                   >
                     View Application
                   </button>
@@ -376,7 +383,7 @@ export default function Applications() {
         {!loading &&
           !error &&
           filtered.length === 0 && (
-            <p className="text-center text-gray-500 text-lg py-16">
+            <p className="text-center text-gray-500 text-sm py-14">
               No applications found.
             </p>
           )}
@@ -387,46 +394,54 @@ export default function Applications() {
   );
 }
 
+/* =========================
+   NAVBAR
+========================= */
+
 function Navbar() {
   return (
-    <nav className="bg-[#080c1a] px-6 md:px-10 py-5 flex justify-between items-center">
-      <Link
-        href="/dashboard"
-        scroll={true}
-        className="flex items-center gap-3"
-      >
-        <FontAwesomeIcon
-          icon={faBrain}
-          className="text-cyan-400 text-2xl"
-        />
+    <nav className="bg-[#080c1a] px-4 sm:px-6 md:px-8 py-3">
+      <div className="flex justify-between items-center gap-4">
+        <Link
+          href="/dashboard"
+          scroll={true}
+          className="flex items-center gap-2.5 min-w-0"
+        >
+          <FontAwesomeIcon
+            icon={faBrain}
+            className="text-cyan-400 text-lg sm:text-xl shrink-0"
+          />
 
-        <div>
-          <h1 className="text-2xl font-bold">
-            Talent
-            <span className="text-cyan-400">
-              IQ
-            </span>
-          </h1>
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold">
+              Talent
+              <span className="text-cyan-400">
+                IQ
+              </span>
+            </h1>
 
-          <p className="text-xs text-gray-500">
-            TALENT INTELLIGENCE
-          </p>
-        </div>
-      </Link>
+            <p className="text-[9px] sm:text-[10px] text-gray-500">
+              TALENT INTELLIGENCE
+            </p>
+          </div>
+        </Link>
 
-      <Link
-        href="/"
-        scroll={true}
-        className="flex items-center gap-2 text-gray-400 hover:text-white"
-      >
-        <FontAwesomeIcon
-          icon={faRightFromBracket}
-        />
-        Logout
-      </Link>
+        <Link
+          href="/"
+          scroll={true}
+          className="flex items-center gap-1.5 text-gray-400 hover:text-white text-xs sm:text-sm shrink-0 transition"
+        >
+          <FontAwesomeIcon icon={faRightFromBracket} />
+          <span>Logout</span>
+        </Link>
+      </div>
     </nav>
   );
 }
+
+/* =========================
+   INFO
+========================= */
 
 function Info({
   icon,
@@ -435,22 +450,22 @@ function Info({
   highlight,
 }) {
   return (
-    <div className="flex gap-3">
+    <div className="flex gap-2.5 min-w-0">
       <FontAwesomeIcon
         icon={icon}
-        className="text-cyan-400 mt-1 shrink-0"
+        className="text-cyan-400 mt-1 shrink-0 text-sm"
       />
 
-      <div className="min-w-0">
-        <p className="text-sm text-gray-500">
+      <div className="min-w-0 flex-1">
+        <p className="text-[10px] sm:text-[11px] text-gray-500">
           {label}
         </p>
 
         <p
           className={
             highlight
-              ? "text-cyan-400 font-bold text-lg break-words"
-              : "text-gray-300 text-lg break-words"
+              ? "text-cyan-400 font-bold text-sm sm:text-base break-words"
+              : "text-gray-300 text-xs sm:text-sm break-words"
           }
         >
           {value}
@@ -460,32 +475,40 @@ function Info({
   );
 }
 
+/* =========================
+   SECTION
+========================= */
+
 function Section({
   icon,
   title,
   children,
 }) {
   return (
-    <div className="bg-[#0b1020] rounded-xl p-6">
-      <h2 className="text-xl font-bold mb-4 flex items-center gap-3">
+    <div className="bg-[#0b1020] rounded-xl p-4 sm:p-5 overflow-hidden">
+      <h2 className="text-base sm:text-lg font-bold mb-3 flex items-center gap-2.5 break-words">
         <FontAwesomeIcon
           icon={icon}
-          className="text-cyan-400"
+          className="text-cyan-400 text-sm shrink-0"
         />
 
         {title}
       </h2>
 
-      <div className="text-gray-300 text-lg leading-7 break-words">
+      <div className="text-xs sm:text-sm text-gray-300 leading-5 sm:leading-6 break-words whitespace-pre-line overflow-hidden">
         {children}
       </div>
     </div>
   );
 }
 
+/* =========================
+   FOOTER
+========================= */
+
 function Footer() {
   return (
-    <footer className="fixed bottom-0 left-0 w-full bg-[#080c1a] py-3 text-center text-gray-600 text-sm z-50">
+    <footer className="w-full bg-[#080c1a] py-3 text-center text-gray-600 text-[11px] sm:text-xs mt-8">
       TalentIQ — AI-Powered Recruitment Platform
     </footer>
   );

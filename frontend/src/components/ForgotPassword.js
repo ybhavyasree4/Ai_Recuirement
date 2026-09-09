@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -26,18 +27,12 @@ export default function ForgotPassword() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email,
+            email: email.trim(),
           }),
         }
       );
 
-      let data = {};
-
-      try {
-        data = await response.json();
-      } catch {
-        data = {};
-      }
+      const data = await response.json();
 
       if (!response.ok) {
         alert(data.detail || "Unable to send reset OTP");
@@ -48,7 +43,7 @@ export default function ForgotPassword() {
       alert("Password reset OTP sent to your email.");
 
       router.push(
-        `/reset-password?email=${encodeURIComponent(email)}`
+        `/reset-password?email=${encodeURIComponent(email.trim())}`
       );
     } catch (error) {
       console.error("Forgot password error:", error);
@@ -58,19 +53,19 @@ export default function ForgotPassword() {
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 sm:px-6 py-8">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-xl">
-        <h1 className="text-2xl sm:text-3xl font-bold text-center">
+    <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 sm:px-6 py-6">
+      <div className="w-full max-w-sm bg-slate-900 border border-slate-800 rounded-xl p-5 sm:p-6 shadow-xl">
+        <h1 className="text-xl sm:text-2xl font-normal text-center">
           Forgot Password
         </h1>
 
-        <p className="text-slate-400 text-sm sm:text-base text-center mt-2 mb-6">
+        <p className="text-slate-400 text-xs sm:text-sm text-center mt-1 mb-5">
           Enter your email to receive a reset OTP
         </p>
 
-        <form onSubmit={handleForgotPassword} className="space-y-5">
+        <form onSubmit={handleForgotPassword} className="space-y-4">
           <div>
-            <label className="block text-sm sm:text-base mb-2">
+            <label className="block text-xs sm:text-sm mb-1.5">
               Email
             </label>
 
@@ -81,20 +76,27 @@ export default function ForgotPassword() {
               placeholder="Enter your email"
               autoComplete="email"
               required
-              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-4 py-3 text-sm sm:text-base outline-none focus:border-cyan-400 transition"
+              disabled={loading}
+              className="w-full bg-slate-800 border border-slate-700 rounded-lg px-3 py-2.5 text-xs sm:text-sm outline-none focus:border-cyan-400 transition disabled:opacity-60"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-cyan-400 hover:bg-cyan-300 disabled:opacity-60 text-black py-3 rounded-lg font-semibold text-sm sm:text-base transition"
+            className="w-full bg-cyan-400 hover:bg-cyan-300 disabled:opacity-60 disabled:cursor-not-allowed text-black py-2.5 rounded-lg font-normal text-xs sm:text-sm transition"
           >
-            {loading ? "Sending..." : "Send OTP"}
+            {loading ? "Sending OTP..." : "Send OTP"}
           </button>
+
+          {loading && (
+            <p className="text-center text-[11px] text-slate-500">
+              Please wait...
+            </p>
+          )}
         </form>
 
-        <p className="text-center text-slate-400 text-sm sm:text-base mt-6">
+        <p className="text-center text-slate-400 text-xs sm:text-sm mt-5">
           Remember your password?{" "}
           <Link
             href="/login"
@@ -104,10 +106,10 @@ export default function ForgotPassword() {
           </Link>
         </p>
 
-        <div className="text-center mt-4">
+        <div className="text-center mt-3">
           <Link
             href="/"
-            className="text-sm sm:text-base text-slate-500 hover:text-white transition"
+            className="text-xs sm:text-sm text-slate-500 hover:text-white transition"
           >
             Back to Home
           </Link>

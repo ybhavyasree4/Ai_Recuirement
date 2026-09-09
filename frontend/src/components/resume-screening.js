@@ -15,7 +15,6 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-
 export default function ResumeScreening() {
   const [file, setFile] = useState(null);
   const [uploading, setUploading] = useState(false);
@@ -128,55 +127,56 @@ export default function ResumeScreening() {
   };
 
   return (
-    <main className="min-h-screen w-full bg-[#050816] text-white flex flex-col">
+    <main className="min-h-screen w-full bg-[#050816] text-white flex flex-col overflow-x-hidden">
       <Navbar />
 
-      <section className="flex-1 w-full px-6 md:px-10 lg:px-14 py-8 pb-12">
+      <section className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 pb-12">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-3 text-lg text-gray-400 hover:text-cyan-400 transition mb-8"
+          className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-cyan-400 transition mb-5"
         >
           <FontAwesomeIcon icon={faArrowLeft} />
           Back to Dashboard
         </Link>
 
-        <div className="mb-8">
-          <p className="text-cyan-400 text-lg font-semibold uppercase">
+        <div className="mb-6">
+          <p className="text-cyan-400 text-xs sm:text-sm font-semibold uppercase">
             Recruitment Tool
           </p>
 
-          <h1 className="text-4xl md:text-5xl font-bold mt-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold mt-1.5">
             Resume Screening
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-400 mt-3">
+          <p className="text-sm sm:text-base text-gray-400 mt-1.5">
             Upload a resume to analyze and create a candidate profile.
           </p>
         </div>
 
+        {/* Upload Section */}
         <div className="w-full flex justify-center">
-          <div className="w-full max-w-5xl bg-[#0b1020] rounded-xl px-8 md:px-12 py-10">
+          <div className="w-full max-w-5xl bg-[#0b1020] rounded-xl p-4 sm:p-5 md:p-6">
             <label
               htmlFor="resume-upload"
               className="block cursor-pointer"
             >
-              <div className="bg-[#080c1a] rounded-xl p-12 md:p-16 text-center hover:bg-[#0d1428] transition">
-                <div className="w-20 h-20 rounded-xl bg-cyan-400/10 flex items-center justify-center mx-auto mb-6">
+              <div className="bg-[#080c1a] rounded-xl p-8 sm:p-10 md:p-12 text-center hover:bg-[#0d1428] transition">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-cyan-400/10 flex items-center justify-center mx-auto mb-4">
                   <FontAwesomeIcon
                     icon={faFilePdf}
-                    className="text-cyan-400 text-4xl"
+                    className="text-cyan-400 text-2xl sm:text-3xl"
                   />
                 </div>
 
-                <h2 className="text-3xl md:text-4xl font-bold">
+                <h2 className="text-xl sm:text-2xl font-bold">
                   Upload Resume
                 </h2>
 
-                <p className="text-xl text-gray-400 mt-4">
+                <p className="text-sm sm:text-base text-gray-400 mt-2">
                   Select a PDF or Word document
                 </p>
 
-                <p className="text-lg text-gray-500 mt-2">
+                <p className="text-xs sm:text-sm text-gray-500 mt-1.5">
                   Supported formats: .pdf, .doc, .docx
                 </p>
 
@@ -190,22 +190,23 @@ export default function ResumeScreening() {
               </div>
             </label>
 
+            {/* Selected File */}
             {file && (
-              <div className="mt-6 bg-[#080c1a] rounded-xl p-6">
-                <div className="flex items-center gap-5 min-w-0">
-                  <div className="w-14 h-14 rounded-xl bg-cyan-400/10 flex items-center justify-center shrink-0">
+              <div className="mt-4 bg-[#080c1a] rounded-xl p-4">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-11 h-11 rounded-xl bg-cyan-400/10 flex items-center justify-center shrink-0">
                     <FontAwesomeIcon
                       icon={faFilePdf}
-                      className="text-cyan-400 text-2xl"
+                      className="text-cyan-400 text-lg"
                     />
                   </div>
 
                   <div className="min-w-0">
-                    <p className="text-xl font-semibold break-words">
+                    <p className="text-sm sm:text-base font-semibold break-words">
                       {file.name}
                     </p>
 
-                    <p className="text-lg text-gray-500 mt-1">
+                    <p className="text-xs text-gray-500 mt-1">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
@@ -213,10 +214,11 @@ export default function ResumeScreening() {
               </div>
             )}
 
+            {/* Upload Button */}
             <button
               onClick={handleUpload}
               disabled={!file || uploading}
-              className="w-full mt-6 bg-cyan-400 hover:bg-cyan-300 disabled:bg-gray-700 disabled:text-gray-500 text-black font-bold text-xl py-5 rounded-xl transition flex items-center justify-center gap-3"
+              className="w-full mt-4 bg-cyan-400 hover:bg-cyan-300 disabled:bg-gray-700 disabled:text-gray-500 text-black font-bold text-sm sm:text-base py-3 rounded-lg transition flex items-center justify-center gap-2"
             >
               <FontAwesomeIcon icon={faUpload} />
 
@@ -225,27 +227,29 @@ export default function ResumeScreening() {
                 : "Upload Resume"}
             </button>
 
+            {/* Success Message */}
             {message && (
-              <div className="mt-6 flex items-start gap-3 p-5 rounded-xl bg-green-500/10 text-green-400">
+              <div className="mt-4 flex items-start gap-2 p-3 rounded-xl bg-green-500/10 text-green-400">
                 <FontAwesomeIcon
                   icon={faCheckCircle}
-                  className="mt-1 shrink-0"
+                  className="mt-0.5 shrink-0 text-sm"
                 />
 
-                <p className="text-lg break-words">
+                <p className="text-xs sm:text-sm break-words">
                   {message}
                 </p>
               </div>
             )}
 
+            {/* Error Message */}
             {error && (
-              <div className="mt-6 flex items-start gap-3 p-5 rounded-xl bg-red-500/10 text-red-400">
+              <div className="mt-4 flex items-start gap-2 p-3 rounded-xl bg-red-500/10 text-red-400">
                 <FontAwesomeIcon
                   icon={faExclamationCircle}
-                  className="mt-1 shrink-0"
+                  className="mt-0.5 shrink-0 text-sm"
                 />
 
-                <p className="text-lg break-words">
+                <p className="text-xs sm:text-sm break-words">
                   {error}
                 </p>
               </div>
@@ -253,40 +257,41 @@ export default function ResumeScreening() {
           </div>
         </div>
 
+        {/* Candidate Profile */}
         {profile && (
           <div className="w-full flex justify-center">
-            <div className="mt-6 w-full max-w-5xl bg-[#0b1020] rounded-xl px-8 md:px-12 py-8">
-              <div className="flex items-center gap-4 mb-7">
-                <div className="w-14 h-14 rounded-xl bg-cyan-400/10 flex items-center justify-center shrink-0">
+            <div className="mt-5 w-full max-w-5xl bg-[#0b1020] rounded-xl p-4 sm:p-5 md:p-6">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="w-11 h-11 rounded-xl bg-cyan-400/10 flex items-center justify-center shrink-0">
                   <FontAwesomeIcon
                     icon={faCheckCircle}
-                    className="text-cyan-400 text-2xl"
+                    className="text-cyan-400 text-lg"
                   />
                 </div>
 
-                <div>
-                  <h2 className="text-2xl md:text-3xl font-bold">
+                <div className="min-w-0">
+                  <h2 className="text-lg sm:text-xl font-bold">
                     Candidate Profile
                   </h2>
 
-                  <p className="text-base md:text-lg text-gray-500 mt-1">
+                  <p className="text-xs sm:text-sm text-gray-500 mt-0.5">
                     Extracted information
                   </p>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 {Object.entries(profile).map(
                   ([key, value]) => (
                     <div
                       key={key}
-                      className="bg-[#080c1a] rounded-xl px-5 py-5 min-h-[150px] flex flex-col overflow-hidden"
+                      className="bg-[#080c1a] rounded-xl px-4 py-4 min-h-[130px] flex flex-col overflow-hidden"
                     >
-                      <p className="text-sm text-cyan-400 uppercase font-semibold">
+                      <p className="text-[10px] sm:text-[11px] text-cyan-400 uppercase font-semibold break-words">
                         {key.replaceAll("_", " ")}
                       </p>
 
-                      <p className="text-lg text-gray-300 mt-3 break-words">
+                      <p className="text-xs sm:text-sm text-gray-300 mt-2 break-words leading-5">
                         {Array.isArray(value)
                           ? value.join(", ")
                           : typeof value === "object" &&
@@ -310,27 +315,34 @@ export default function ResumeScreening() {
   );
 }
 
+/* =========================
+   NAVBAR
+========================= */
+
 function Navbar() {
   return (
     <nav className="bg-[#080c1a] w-full shrink-0">
-      <div className="w-full px-6 md:px-10 lg:px-14 py-5 flex items-center justify-between">
+      <div className="w-full px-4 sm:px-6 md:px-8 py-3 flex items-center justify-between gap-4">
         <Link
           href="/dashboard"
-          className="flex items-center gap-4"
+          className="flex items-center gap-2.5 min-w-0"
         >
-          <div className="w-14 h-14 rounded-xl bg-cyan-400/10 flex items-center justify-center">
+          <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-cyan-400/10 flex items-center justify-center shrink-0">
             <FontAwesomeIcon
               icon={faBrain}
-              className="text-cyan-400 text-2xl"
+              className="text-cyan-400 text-lg sm:text-xl"
             />
           </div>
 
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold">
-              Talent<span className="text-cyan-400">IQ</span>
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl font-bold">
+              Talent
+              <span className="text-cyan-400">
+                IQ
+              </span>
             </h1>
 
-            <p className="text-xs text-gray-500">
+            <p className="text-[9px] sm:text-[10px] text-gray-500">
               TALENT INTELLIGENCE
             </p>
           </div>
@@ -338,7 +350,7 @@ function Navbar() {
 
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg text-gray-400 hover:text-white transition"
+          className="flex items-center gap-1.5 text-xs sm:text-sm text-gray-400 hover:text-white transition shrink-0"
         >
           <FontAwesomeIcon icon={faRightFromBracket} />
 
@@ -351,9 +363,13 @@ function Navbar() {
   );
 }
 
+/* =========================
+   FOOTER
+========================= */
+
 function Footer() {
   return (
-    <footer className="fixed bottom-0 left-0 w-full bg-[#080c1a] py-3 text-center text-gray-600 text-sm z-50">
+    <footer className="w-full bg-[#080c1a] py-3 text-center text-gray-600 text-[11px] sm:text-xs mt-8">
       TalentIQ — AI-Powered Recruitment Platform
     </footer>
   );

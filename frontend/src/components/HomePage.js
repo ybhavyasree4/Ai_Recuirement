@@ -63,118 +63,103 @@ export default function HomePage() {
   ];
 
   return (
-    <main className="min-h-[100dvh] w-full overflow-x-hidden bg-[#050816] text-white">
-      {/* =====================================================
-          NAVBAR
-      ===================================================== */}
+    <main className="min-h-screen w-full bg-[#050816] text-white overflow-x-hidden">
 
-      <nav className="w-full px-4 py-5 sm:px-6 sm:py-6 md:px-8 md:py-7 lg:px-10 xl:px-12">
-        <div className="flex w-full items-center justify-between gap-4">
-          {/* LOGO */}
+      <nav className="w-full px-4 sm:px-6 md:px-10 lg:px-16 py-3 sm:py-4 flex justify-between items-center gap-4">
 
+        <Link
+          href="/home"
+          className="flex items-center gap-2 sm:gap-3 min-w-0"
+        >
+          <div className="w-9 h-9 sm:w-10 sm:h-10 md:w-11 md:h-11 rounded-lg bg-cyan-400/10 flex items-center justify-center shrink-0">
+            <FontAwesomeIcon
+              icon={faBrain}
+              className="text-cyan-400 text-lg sm:text-xl md:text-2xl"
+            />
+          </div>
+
+          <div className="min-w-0">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-normal">
+              Talent<span className="text-cyan-400">IQ</span>
+            </h1>
+
+            <p className="text-[7px] sm:text-[8px] md:text-[9px] text-gray-500 tracking-wide">
+              TALENT INTELLIGENCE
+            </p>
+          </div>
+        </Link>
+
+        <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
           <Link
-            href="/home"
-            className="flex min-w-0 shrink-0 items-center gap-3 sm:gap-4 md:gap-5"
+            href="/login"
+            className="px-2.5 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 text-xs sm:text-sm md:text-sm font-normal text-gray-300"
           >
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 sm:h-14 sm:w-14 md:h-16 md:w-16">
-              <FontAwesomeIcon
-                icon={faBrain}
-                className="text-xl text-cyan-400 sm:text-2xl md:text-[28px]"
-              />
-            </div>
-
-            <div className="min-w-0">
-              <h1 className="whitespace-nowrap text-2xl font-bold sm:text-[28px] md:text-[32px]">
-                Talent<span className="text-cyan-400">IQ</span>
-              </h1>
-
-              <p className="mt-0.5 whitespace-nowrap text-[8px] tracking-[0.14em] text-gray-500 sm:text-[9px] md:text-[10px]">
-                TALENT INTELLIGENCE
-              </p>
-            </div>
+            Login
           </Link>
 
-          {/* LOGIN / SIGN UP */}
-
-          <div className="flex shrink-0 items-center gap-2 sm:gap-3 md:gap-4">
-            <Link
-              href="/login"
-              className="rounded-lg px-3 py-2.5 text-sm font-semibold text-gray-300 transition hover:bg-white/5 hover:text-white sm:px-5 sm:py-3 sm:text-base md:px-6 md:text-lg"
-            >
-              Login
-            </Link>
-
-            <Link
-              href="/signup"
-              className="rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-bold text-black transition hover:bg-cyan-300 sm:px-6 sm:py-3 sm:text-base md:px-7 md:py-3.5 md:text-lg"
-            >
-              Sign Up
-            </Link>
-          </div>
+          <Link
+            href="/signup"
+            className="px-2.5 sm:px-4 md:px-5 py-1.5 sm:py-2 md:py-2.5 rounded-lg bg-cyan-400 text-black font-normal text-xs sm:text-sm md:text-sm"
+          >
+            Sign Up
+          </Link>
         </div>
       </nav>
 
-      {/* =====================================================
-          HERO SECTION
-      ===================================================== */}
+      <section className="w-full min-h-[calc(100vh-70px)] px-4 sm:px-6 md:px-10 lg:px-16 py-8 sm:py-10 md:py-12 lg:py-14 flex items-center">
 
-      <section className="flex min-h-[calc(100vh-90px)] w-full items-center px-4 py-16 sm:px-6 md:px-8 lg:px-10 xl:px-12">
-        <div className="grid w-full grid-cols-1 items-center gap-16 lg:grid-cols-[1.1fr_0.9fr]">
-          {/* LEFT HERO */}
+        <div className="w-full grid grid-cols-2 gap-3 sm:gap-5 md:gap-8 lg:gap-14 items-center">
 
+          <div className="min-w-0">
 
+            <p className="text-cyan-400 text-[9px] sm:text-xs md:text-sm font-normal">
+              AI-POWERED RECRUITMENT
+            </p>
 
-<div className="w-full max-w-[720px]">
-  <p className="text-sm font-semibold uppercase tracking-[0.16em] text-cyan-400 sm:text-base">
-    AI-Powered Recruitment
-  </p>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-normal mt-2 sm:mt-3 md:mt-4 leading-[1.08]">
 
-  <h2 className="mt-5 text-[clamp(46px,5.5vw,78px)] font-bold leading-[1.02] tracking-[-0.04em]">
-    Hire smarter.
-    <span className="mt-2 block text-cyan-400">
-      Find better talent.
-    </span>
-  </h2>
+              Hire smarter.
 
-  <p className="mt-7 max-w-[650px] text-base leading-[1.7] text-gray-400 sm:text-lg md:text-xl">
-    TalentIQ helps recruiters screen resumes, understand candidate
-    profiles, match talent with jobs, analyze skill gaps, and make
-    data-driven hiring decisions with AI-powered intelligence.
-  </p>
+              <span className="block text-cyan-400 mt-1.5 sm:mt-2">
+                Find better talent.
+              </span>
+            </h2>
 
-  <button
-    onClick={exploreFeatures}
-    className="mt-8 inline-flex items-center rounded-xl border border-white/10 bg-white/5 px-7 py-3.5 text-base font-semibold transition hover:bg-white/10 sm:text-lg"
-  >
-    Explore TalentIQ
+            <p className="text-gray-400 text-[10px] sm:text-xs md:text-sm lg:text-base mt-3 sm:mt-4 md:mt-5 max-w-3xl leading-relaxed">
+              TalentIQ helps recruiters screen resumes, understand candidate
+              profiles, match talent with jobs and make better hiring
+              decisions.
+            </p>
 
-    <FontAwesomeIcon
-      icon={faArrowDown}
-      className="ml-3"
-    />
-  </button>
-</div>
+            <button
+              onClick={exploreFeatures}
+              className="mt-4 sm:mt-5 md:mt-6 px-3 sm:px-4 md:px-5 py-2 sm:py-2.5 rounded-lg bg-white/5 border border-white/10 font-normal text-[10px] sm:text-xs md:text-sm"
+            >
+              Explore TalentIQ
 
+              <FontAwesomeIcon
+                icon={faArrowDown}
+                className="ml-1.5"
+              />
+            </button>
+          </div>
 
+          <div className="w-full min-w-0 bg-[#0b1020] rounded-xl p-3 sm:p-4 md:p-5 lg:p-6">
 
-          {/* RIGHT PANEL */}
-
-          <div className="w-full max-w-[760px] rounded-3xl border border-white/5 bg-[#0b1020] p-8 sm:p-10 md:p-12">
-            <p className="text-base font-semibold tracking-wide text-cyan-400">
+            <p className="text-cyan-400 text-[8px] sm:text-[10px] md:text-xs font-normal">
               TALENT INTELLIGENCE
             </p>
 
-            <h3 className="mt-3 text-[clamp(32px,2.5vw,42px)] font-bold">
+            <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-normal mt-1">
               Smarter Recruitment
             </h3>
 
-            <p className="mt-3 text-lg text-gray-500">
+            <p className="text-[8px] sm:text-[10px] md:text-xs text-gray-500 mt-1">
               AI-powered insights for better hiring
             </p>
 
-            {/* STATS */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-1.5 sm:gap-2 md:gap-3 mt-3 sm:mt-4">
 
-            <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
               <Stat
                 icon={faUsers}
                 title="Candidates"
@@ -200,9 +185,8 @@ export default function HomePage() {
               />
             </div>
 
-            {/* TOOLS */}
+            <div className="grid grid-cols-2 gap-1.5 sm:gap-2 md:gap-3 mt-2 sm:mt-3">
 
-            <div className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <Mini
                 icon={faFileCircleCheck}
                 title="Resume Screening"
@@ -227,177 +211,152 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* =====================================================
-          FEATURES
-      ===================================================== */}
-
       <section
         id="features"
-        className="w-full border-t border-white/[0.04] px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-24 lg:px-10 lg:py-28 xl:px-12"
+        className="w-full px-4 sm:px-6 md:px-10 lg:px-16 py-12 sm:py-14 md:py-16 lg:py-20"
       >
-        <div className="w-full">
-          {/* HEADER */}
 
-          <div className="mb-10 text-center sm:mb-12 md:mb-16">
-            <p className="text-sm font-semibold tracking-wide text-cyan-400 sm:text-base">
-              TALENTIQ FEATURES
-            </p>
+        <div className="text-center mb-8 sm:mb-10 md:mb-12">
 
-            <h3 className="mt-3 text-[clamp(30px,4vw,54px)] font-bold leading-tight">
-              Everything recruiters need
-            </h3>
+          <p className="text-cyan-400 text-xs sm:text-sm font-normal">
+            TALENTIQ FEATURES
+          </p>
 
-            <p className="mx-auto mt-4 max-w-[700px] text-sm leading-relaxed text-gray-500 sm:text-base md:text-lg">
-              Simplify candidate screening, matching and hiring decisions.
-            </p>
-          </div>
+          <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal mt-2 sm:mt-3">
+            Everything recruiters need
+          </h3>
 
-          {/* FEATURE CARDS */}
+          <p className="text-gray-500 text-xs sm:text-sm md:text-base mt-3">
+            Simplify candidate screening, matching and hiring decisions.
+          </p>
+        </div>
 
-          <div className="grid w-full grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5 xl:gap-6">
-            {features.map(([icon, title, text]) => (
-              <Feature
-                key={title}
-                icon={icon}
-                title={title}
-                text={text}
-              />
-            ))}
-          </div>
+        <div className="w-full grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4 md:gap-5 lg:gap-6">
+
+          {features.map(([icon, title, text]) => (
+            <Feature
+              key={title}
+              icon={icon}
+              title={title}
+              text={text}
+            />
+          ))}
         </div>
       </section>
 
-      {/* =====================================================
-          HOW IT WORKS
-      ===================================================== */}
+      <section className="w-full px-4 sm:px-6 md:px-10 lg:px-16 py-12 sm:py-14 md:py-16 lg:py-20">
 
-      <section className="w-full border-t border-white/[0.04] px-4 py-16 sm:px-6 sm:py-20 md:px-8 md:py-24 lg:px-10 lg:py-28 xl:px-12">
-        <div className="w-full">
-          {/* HEADER */}
+        <div className="text-center mb-8 sm:mb-10 md:mb-12">
 
-          <div className="mb-10 text-center sm:mb-12 md:mb-16">
-            <p className="text-sm font-semibold tracking-wide text-cyan-400 sm:text-base">
-              HOW IT WORKS
-            </p>
+          <p className="text-cyan-400 text-xs sm:text-sm font-normal">
+            HOW IT WORKS
+          </p>
 
-            <h3 className="mt-3 text-[clamp(30px,4vw,54px)] font-bold leading-tight">
-              From resume to hiring decision
-            </h3>
-          </div>
+          <h3 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-normal mt-2 sm:mt-3">
+            From resume to hiring decision
+          </h3>
+        </div>
 
-          {/* STEPS */}
+        <div className="w-full grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-5 sm:gap-6 md:gap-8">
 
-          <div className="grid w-full grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-5 lg:gap-5 xl:gap-8">
-            {steps.map(([number, title, text]) => (
-              <Step
-                key={number}
-                number={number}
-                title={title}
-                text={text}
-              />
-            ))}
-          </div>
+          {steps.map(([number, title, text]) => (
+            <Step
+              key={number}
+              number={number}
+              title={title}
+              text={text}
+            />
+          ))}
         </div>
       </section>
 
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
-
-      <footer className="w-full border-t border-white/[0.04] px-4 py-7 text-center text-xs text-gray-600 sm:text-sm">
+      <footer className="w-full text-center px-4 py-5 sm:py-6 text-gray-600 text-[10px] sm:text-xs">
         TalentIQ — AI-Powered Recruitment Platform
       </footer>
+
     </main>
   );
 }
 
-/* =========================================================
-   STAT COMPONENT
-========================================================= */
-
 function Stat({ icon, title, value }) {
   return (
-    <div className="min-w-0 rounded-lg bg-white/[0.04] p-3 sm:p-3.5 md:p-4">
+    <div className="w-full bg-white/[0.04] rounded-lg p-2 sm:p-2.5 md:p-3">
+
       <FontAwesomeIcon
         icon={icon}
-        className="text-xs text-cyan-400 sm:text-sm"
+        className="text-cyan-400 text-[10px] sm:text-xs md:text-sm"
       />
 
-      <p className="mt-2 truncate text-[9px] text-gray-500 sm:text-[10px] md:text-xs">
+      <p className="text-[7px] sm:text-[8px] md:text-[10px] text-gray-500 mt-1">
         {title}
       </p>
 
-      <p className="mt-1 text-base font-bold sm:text-lg md:text-xl">
+      <p className="text-xs sm:text-sm md:text-base font-normal mt-0.5">
         {value}
       </p>
+
     </div>
   );
 }
-
-/* =========================================================
-   MINI COMPONENT
-========================================================= */
 
 function Mini({ icon, title }) {
   return (
-    <div className="flex min-w-0 items-center gap-2.5 rounded-lg bg-white/[0.025] p-3 sm:gap-3 sm:p-3.5">
+    <div className="w-full min-w-0 flex items-center gap-1.5 sm:gap-2 bg-white/[0.025] rounded-lg p-2 sm:p-2.5 md:p-3">
+
       <FontAwesomeIcon
         icon={icon}
-        className="shrink-0 text-xs text-cyan-400 sm:text-sm"
+        className="text-cyan-400 text-[10px] sm:text-xs md:text-sm shrink-0"
       />
 
-      <p className="min-w-0 truncate text-[11px] font-semibold sm:text-xs md:text-sm">
+      <p className="text-[7px] sm:text-[9px] md:text-xs font-normal truncate">
         {title}
       </p>
+
     </div>
   );
 }
-
-/* =========================================================
-   FEATURE COMPONENT
-========================================================= */
 
 function Feature({ icon, title, text }) {
   return (
-    <div className="w-full min-w-0 rounded-xl bg-[#0b1020] p-5 transition duration-300 hover:bg-[#0d1325] sm:p-6 lg:p-7">
-      <div className="mb-5 flex h-11 w-11 items-center justify-center rounded-lg bg-cyan-400/10">
-        <FontAwesomeIcon
-          icon={icon}
-          className="text-lg text-cyan-400"
-        />
-      </div>
+    <div className="w-full min-w-0 bg-[#0b1020] rounded-lg sm:rounded-xl p-3 sm:p-4 md:p-5 lg:p-6">
 
-      <h4 className="text-lg font-bold sm:text-xl">
+      <FontAwesomeIcon
+        icon={icon}
+        className="text-cyan-400 text-base sm:text-lg md:text-xl mb-2 sm:mb-3"
+      />
+
+      <h4 className="text-xs sm:text-sm md:text-base lg:text-lg font-normal">
         {title}
       </h4>
 
-      <p className="mt-3 text-sm leading-relaxed text-gray-500 sm:text-base">
+      <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-1.5 sm:mt-2 leading-relaxed">
         {text}
       </p>
+
     </div>
   );
 }
 
-/* =========================================================
-   STEP COMPONENT
-========================================================= */
-
 function Step({ number, title, text }) {
   return (
-    <div className="w-full min-w-0 text-center">
-      <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-cyan-400/10 sm:h-16 sm:w-16">
-        <span className="text-sm font-bold text-cyan-400 sm:text-base">
+    <div className="text-center min-w-0">
+
+      <div className="w-9 h-9 sm:w-10 sm:h-10 md:w-12 md:h-12 mx-auto rounded-full bg-cyan-400/10 flex items-center justify-center">
+
+        <span className="text-cyan-400 font-normal text-xs sm:text-sm">
           {number}
         </span>
+
       </div>
 
-      <h4 className="mt-5 text-lg font-bold sm:text-xl">
+      <h4 className="font-normal text-sm sm:text-base md:text-lg mt-2 sm:mt-3">
         {title}
       </h4>
 
-      <p className="mx-auto mt-3 max-w-[240px] text-sm leading-relaxed text-gray-500 sm:text-base">
+      <p className="text-[9px] sm:text-[10px] md:text-xs text-gray-500 mt-1.5 sm:mt-2">
         {text}
       </p>
+
     </div>
   );
 }

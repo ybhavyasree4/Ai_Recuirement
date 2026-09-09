@@ -14,13 +14,13 @@ import {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
-
 export default function JobMatching() {
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [selectedJob, setSelectedJob] = useState(null);
   const [search, setSearch] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     loadData();
@@ -28,6 +28,9 @@ export default function JobMatching() {
 
   async function loadData() {
     try {
+      setLoading(true);
+      setError("");
+
       const [jobsRes, applicationsRes] = await Promise.all([
         fetch(`${API_URL}/jobs`),
         fetch(`${API_URL}/applications`),
@@ -49,6 +52,8 @@ export default function JobMatching() {
     } catch (err) {
       console.error(err);
       setError("Unable to load job matching data.");
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -88,16 +93,6 @@ export default function JobMatching() {
       .toLowerCase();
   }
 
-  /*
-    SEARCH LOGIC
-
-    Number search:
-    25 -> only Job ID 25
-
-    Text search:
-    Python -> jobs containing Python
-    Software -> jobs containing Software
-  */
   const filteredJobs = jobs.filter((job) => {
     const query = search.trim().toLowerCase();
 
@@ -105,12 +100,10 @@ export default function JobMatching() {
       return true;
     }
 
-    // Exact Job ID search
     if (/^\d+$/.test(query)) {
       return String(job.job_id) === query;
     }
 
-    // Text search
     return getJobSearchText(job).includes(query);
   });
 
@@ -150,9 +143,6 @@ export default function JobMatching() {
     return `${getScore(number).toFixed(2)}%`;
   }
 
-  /*
-    Candidates are sorted by highest Match Score first
-  */
   const matchedCandidates = selectedJob
     ? applications
         .filter(
@@ -168,43 +158,39 @@ export default function JobMatching() {
     : [];
 
   return (
-    <main className="min-h-screen w-full bg-[#050816] text-white flex flex-col">
+    <main className="min-h-screen w-full bg-[#050816] text-white flex flex-col overflow-x-hidden">
       <Navbar />
 
-      <section className="flex-1 w-full px-6 md:px-10 lg:px-14 py-8">
-
-        {/* BACK */}
-
+      <section className="flex-1 w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-6 pb-10">
         <Link
           href="/dashboard"
-          className="inline-flex items-center gap-3 text-lg text-gray-400 hover:text-cyan-400 transition mb-8"
+          className="inline-flex items-center gap-2 text-sm text-gray-400 hover:text-cyan-400 transition mb-5"
         >
-          <FontAwesomeIcon icon={faArrowLeft} />
+          <FontAwesomeIcon
+            icon={faArrowLeft}
+            className="text-xs"
+          />
           Back to Dashboard
         </Link>
 
-        {/* HEADER */}
-
-        <div className="mb-8">
-          <p className="text-cyan-400 text-lg font-semibold uppercase">
+        <div className="mb-5">
+          <p className="text-cyan-400 text-xs sm:text-sm font-normal uppercase">
             Recruitment Tool
           </p>
 
-          <h1 className="text-4xl md:text-5xl font-bold mt-2">
+          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-normal mt-1">
             Job Matching
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-400 mt-3">
+          <p className="text-sm sm:text-base text-gray-400 mt-2">
             Match candidates with suitable job requirements.
           </p>
         </div>
 
-        {/* SEARCH */}
-
-        <div className="relative mb-7">
+        <div className="relative mb-5">
           <FontAwesomeIcon
             icon={faMagnifyingGlass}
-            className="absolute left-5 top-4 text-gray-500 text-lg"
+            className="absolute left-3 top-3 text-gray-500 text-sm"
           />
 
           <input
@@ -213,10 +199,6 @@ export default function JobMatching() {
             onChange={(e) => {
               setSearch(e.target.value);
 
-              /*
-                If search changes and current selected job
-                is not in the filtered result, clear selection.
-              */
               const value = e.target.value.trim();
 
               if (value) {
@@ -232,125 +214,110 @@ export default function JobMatching() {
               }
             }}
             placeholder="Search jobs..."
-            className="w-full bg-[#0b1020] rounded-xl py-4 pl-12 pr-5 text-lg text-white outline-none placeholder:text-gray-600 focus:bg-[#0d1428]"
+            className="w-full bg-[#0b1020] rounded-lg py-2.5 pl-9 pr-4 text-sm text-white outline-none placeholder:text-gray-600 focus:bg-[#0d1428]"
           />
         </div>
 
-        {/* ERROR */}
-
         {error && (
-          <div className="mb-6 bg-red-500/10 text-red-400 rounded-xl p-5 text-lg">
+          <div className="mb-5 bg-red-500/10 text-red-400 rounded-lg p-3 text-sm">
             {error}
           </div>
         )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-[380px_minmax(0,1fr)] gap-6 items-start">
-
-          {/* JOB LIST */}
-
-          <div className="bg-[#0b1020] rounded-xl h-[calc(100vh-300px)] min-h-[500px] flex flex-col overflow-hidden">
-
-            <div className="p-6 shrink-0">
+        <div className="grid grid-cols-1 lg:grid-cols-[320px_minmax(0,1fr)] gap-4 items-start">
+          <div className="bg-[#0b1020] rounded-xl h-[calc(100vh-270px)] min-h-[450px] flex flex-col overflow-hidden">
+            <div className="p-4 shrink-0">
               <div className="flex items-center justify-between">
-
-                <h2 className="text-2xl font-bold">
+                <h2 className="text-base sm:text-lg font-normal">
                   Available Jobs
                 </h2>
 
-                <span className="text-base text-cyan-400 font-semibold">
-                  {filteredJobs.length}
+                <span className="text-xs text-cyan-400 font-normal">
+                  {loading ? "..." : filteredJobs.length}
                 </span>
-
               </div>
 
-              <p className="text-base text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 mt-1">
                 Select a job to view matched candidates
               </p>
             </div>
 
-            <div className="flex-1 min-h-0 overflow-y-auto px-3 pb-3">
+            <div className="flex-1 min-h-0 overflow-y-auto px-2 pb-2">
+              {loading ? (
+                <div className="h-full min-h-[300px] flex flex-col items-center justify-center text-center px-4">
+                  <p className="text-sm text-gray-400 font-normal">
+                    Loading jobs...
+                  </p>
 
-              {filteredJobs.length === 0 ? (
-
-                <div className="p-8 text-center text-gray-500 text-lg">
+                  <p className="text-[11px] text-gray-600 mt-1 font-normal">
+                    Please wait while job data is loaded.
+                  </p>
+                </div>
+              ) : filteredJobs.length === 0 ? (
+                <div className="p-6 text-center text-gray-500 text-sm font-normal">
                   No jobs found.
                 </div>
-
               ) : (
-
                 filteredJobs.map((job, index) => (
-
                   <button
                     key={job.job_id || index}
-                    onClick={() => setSelectedJob(job)}
-                    className={`w-full text-left rounded-xl p-5 mb-2 transition ${
+                    onClick={() => {
+                      setSelectedJob(job);
+                      window.scrollTo({
+                        top: 0,
+                        behavior: "smooth",
+                      });
+                    }}
+                    className={`w-full text-left rounded-lg p-3 mb-1.5 transition ${
                       selectedJob?.job_id === job.job_id
                         ? "bg-cyan-400/10"
                         : "hover:bg-white/5"
                     }`}
                   >
-
-                    <div className="flex items-center gap-4">
-
-                      <div className="w-14 h-14 min-w-14 rounded-xl bg-cyan-400/10 flex items-center justify-center">
-
+                    <div className="flex items-center gap-3">
+                      <div className="w-9 h-9 min-w-9 rounded-lg bg-cyan-400/10 flex items-center justify-center">
                         <FontAwesomeIcon
                           icon={faBriefcase}
-                          className="text-cyan-400 text-xl"
+                          className="text-cyan-400 text-sm"
                         />
-
                       </div>
 
                       <div className="min-w-0">
-
-                        <p className="text-lg font-semibold break-words">
+                        <p className="text-sm font-normal break-words">
                           {getJobTitle(job, index)}
                         </p>
 
-                        <p className="text-base text-gray-500 mt-1">
+                        <p className="text-[11px] text-gray-500 mt-1 font-normal">
                           Job ID: {job.job_id || "N/A"}
                         </p>
-
                       </div>
-
                     </div>
-
                   </button>
-
                 ))
               )}
-
             </div>
           </div>
 
-          {/* MATCHED CANDIDATES */}
-
-          <div className="bg-[#0b1020] rounded-xl p-7 md:p-8 min-h-[500px]">
-
+          <div className="bg-[#0b1020] rounded-xl p-4 sm:p-5 md:p-6 min-h-[450px] min-w-0">
             {!selectedJob ? (
-
-              <div className="min-h-[550px] flex flex-col items-center justify-center text-center px-6">
-
-                <div className="w-20 h-20 rounded-xl bg-cyan-400/10 flex items-center justify-center mb-6">
-
+              <div className="min-h-[420px] flex flex-col items-center justify-center text-center px-4">
+                <div className="w-14 h-14 rounded-xl bg-cyan-400/10 flex items-center justify-center mb-4">
                   <FontAwesomeIcon
                     icon={faBriefcase}
-                    className="text-cyan-400 text-4xl"
+                    className="text-cyan-400 text-2xl"
                   />
-
                 </div>
 
-                <h2 className="text-3xl font-bold">
+                <h2 className="text-2xl sm:text-3xl font-normal">
                   Job Matching
                 </h2>
 
-                <p className="text-lg text-gray-400 mt-3 max-w-xl">
+                <p className="text-sm text-gray-400 mt-2 max-w-xl font-normal">
                   Select a job to view candidates ranked by
                   their match score.
                 </p>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8 w-full max-w-3xl">
-
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-6 w-full max-w-3xl">
                   <InfoCard
                     icon={faBriefcase}
                     text="Job Requirements"
@@ -365,144 +332,174 @@ export default function JobMatching() {
                     icon={faMagnifyingGlass}
                     text="Highest Score First"
                   />
-
                 </div>
-
               </div>
-
             ) : (
-
               <>
-
-                {/* SELECTED JOB */}
-
-                <div className="mb-7">
-
-                  <p className="text-cyan-400 text-base font-semibold uppercase">
+                <div className="mb-5">
+                  <p className="text-cyan-400 text-xs font-normal uppercase">
                     Selected Job
                   </p>
 
-                  <h2 className="text-3xl md:text-4xl font-bold mt-2 break-words">
+                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-normal mt-1 break-words">
                     {getJobTitle(selectedJob)}
                   </h2>
 
-                  <p className="text-lg text-gray-500 mt-2">
+                  <p className="text-xs text-gray-500 mt-1 font-normal">
                     Job ID: {selectedJob.job_id || "N/A"}
                   </p>
 
-                  <p className="text-lg text-gray-400 mt-3">
+                  <p className="text-sm text-gray-400 mt-2 font-normal">
                     {matchedCandidates.length} matched candidates
                   </p>
-
                 </div>
 
-                {/* CANDIDATES */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-6">
+                  <JobInfoCard
+                    label="Job Title"
+                    value={getJobTitle(selectedJob)}
+                  />
 
-                {matchedCandidates.length === 0 ? (
+                  <JobInfoCard
+                    label="Job ID"
+                    value={selectedJob.job_id || "N/A"}
+                  />
 
-                  <div className="bg-[#080c1a] rounded-xl p-8 text-center">
+                  <JobInfoCard
+                    label="Company"
+                    value={
+                      selectedJob.company_name ||
+                      selectedJob.company ||
+                      selectedJob.companyName ||
+                      "Not specified"
+                    }
+                  />
 
-                    <FontAwesomeIcon
-                      icon={faUsers}
-                      className="text-gray-600 text-4xl mb-4"
-                    />
+                  <JobInfoCard
+                    label="Location"
+                    value={
+                      selectedJob.location ||
+                      selectedJob.locations ||
+                      "Not specified"
+                    }
+                  />
 
-                    <p className="text-xl text-gray-400">
-                      No matched candidates found.
-                    </p>
+                  <JobInfoCard
+                    label="Required Skills"
+                    value={
+                      selectedJob.skills_required ||
+                      selectedJob.required_skills ||
+                      selectedJob.skills ||
+                      "Not specified"
+                    }
+                    wide
+                  />
 
+                  <JobInfoCard
+                    label="Job Description"
+                    value={
+                      selectedJob.job_description ||
+                      selectedJob.description ||
+                      selectedJob.responsibilities ||
+                      "No job description available."
+                    }
+                    wide
+                  />
+                </div>
+
+                <div>
+                  <div className="flex items-center justify-between gap-3 mb-3">
+                    <div>
+                      <h3 className="text-lg sm:text-xl font-normal">
+                        Matching Candidates
+                      </h3>
+
+                      <p className="text-[11px] text-gray-600 mt-1 font-normal">
+                        Candidates ranked according to their match score.
+                      </p>
+                    </div>
+
+                    <span className="text-xs text-gray-500 font-normal">
+                      {matchedCandidates.length}
+                    </span>
                   </div>
 
-                ) : (
+                  {matchedCandidates.length === 0 ? (
+                    <div className="bg-[#080c1a] rounded-xl p-6 text-center">
+                      <FontAwesomeIcon
+                        icon={faUsers}
+                        className="text-gray-600 text-3xl mb-3"
+                      />
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5">
+                      <p className="text-sm text-gray-400 font-normal">
+                        No matched candidates found.
+                      </p>
+                    </div>
+                  ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">
+                      {matchedCandidates.map(
+                        (application, index) => (
+                          <div
+                            key={
+                              application.application_id ||
+                              index
+                            }
+                            className="bg-[#080c1a] rounded-xl px-4 py-4 min-h-[190px] flex flex-col overflow-hidden"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-9 h-9 min-w-9 rounded-lg bg-cyan-400/10 flex items-center justify-center">
+                                <FontAwesomeIcon
+                                  icon={faUsers}
+                                  className="text-cyan-400 text-sm"
+                                />
+                              </div>
 
-                    {matchedCandidates.map(
-                      (application, index) => (
+                              <div className="min-w-0">
+                                <p className="text-sm font-normal break-words">
+                                  Candidate{" "}
+                                  {application.candidate_id ||
+                                    "N/A"}
+                                </p>
 
-                        <div
-                          key={
-                            application.application_id ||
-                            index
-                          }
-                          className="bg-[#080c1a] rounded-xl px-6 py-5 h-[260px] flex flex-col overflow-hidden"
-                        >
-
-                          {/* CANDIDATE */}
-
-                          <div className="flex items-center gap-4">
-
-                            <div className="w-14 h-14 min-w-14 rounded-xl bg-cyan-400/10 flex items-center justify-center">
-
-                              <FontAwesomeIcon
-                                icon={faUsers}
-                                className="text-cyan-400 text-xl"
-                              />
-
+                                <p className="text-[11px] text-gray-500 mt-1 font-normal">
+                                  Application ID:{" "}
+                                  {application.application_id ||
+                                    "N/A"}
+                                </p>
+                              </div>
                             </div>
 
-                            <div className="min-w-0">
-
-                              <p className="text-lg font-semibold truncate">
-                                Candidate{" "}
-                                {application.candidate_id}
+                            <div className="mt-4">
+                              <p className="text-[10px] text-cyan-400 uppercase font-normal">
+                                Match Score
                               </p>
 
-                              <p className="text-base text-gray-500 mt-1">
-                                Application ID:{" "}
-                                {application.application_id ||
-                                  "N/A"}
+                              <p className="text-2xl font-normal mt-1">
+                                {formatScore(
+                                  application.match_score
+                                )}
                               </p>
-
                             </div>
 
+                            <div className="mt-auto pt-3">
+                              <p className="text-[10px] text-cyan-400 uppercase font-normal">
+                                Skill Match
+                              </p>
+
+                              <p className="text-lg font-normal mt-1">
+                                {formatScore(
+                                  application.skill_match_percentage
+                                )}
+                              </p>
+                            </div>
                           </div>
-
-                          {/* MATCH SCORE */}
-
-                          <div className="mt-6">
-
-                            <p className="text-sm text-cyan-400 uppercase font-semibold">
-                              Match Score
-                            </p>
-
-                            <p className="text-3xl font-bold mt-2">
-                              {formatScore(
-                                application.match_score
-                              )}
-                            </p>
-
-                          </div>
-
-                          {/* SKILL MATCH - NO BOX */}
-
-                          <div className="mt-auto">
-
-                            <p className="text-sm text-cyan-400 uppercase font-semibold">
-                              Skill Match
-                            </p>
-
-                            <p className="text-2xl font-bold mt-1">
-                              {formatScore(
-                                application.skill_match_percentage
-                              )}
-                            </p>
-
-                          </div>
-
-                        </div>
-
-                      )
-                    )}
-
-                  </div>
-
-                )}
-
+                        )
+                      )}
+                    </div>
+                  )}
+                </div>
               </>
-
             )}
-
           </div>
         </div>
       </section>
@@ -512,87 +509,86 @@ export default function JobMatching() {
   );
 }
 
-/* INFO CARD */
-
-function InfoCard({ icon, text }) {
+function JobInfoCard({ label, value, wide = false }) {
   return (
-    <div className="bg-[#080c1a] rounded-xl p-5 min-h-[120px] flex flex-col items-center justify-center">
-
-      <FontAwesomeIcon
-        icon={icon}
-        className="text-cyan-400 text-2xl mb-3"
-      />
-
-      <p className="text-base font-semibold text-gray-300 text-center">
-        {text}
+    <div
+      className={`bg-[#080c1a] rounded-xl px-4 py-4 min-h-[110px] overflow-hidden ${
+        wide ? "sm:col-span-2 lg:col-span-3" : ""
+      }`}
+    >
+      <p className="text-[10px] sm:text-[11px] text-cyan-400 font-normal uppercase">
+        {label}
       </p>
 
+      <p className="text-xs sm:text-sm text-gray-300 font-normal mt-2 break-words whitespace-pre-wrap leading-relaxed">
+        {value}
+      </p>
     </div>
   );
 }
 
-/* NAVBAR */
+function InfoCard({ icon, text }) {
+  return (
+    <div className="bg-[#080c1a] rounded-xl p-4 min-h-[100px] flex flex-col items-center justify-center">
+      <FontAwesomeIcon
+        icon={icon}
+        className="text-cyan-400 text-lg mb-2"
+      />
+
+      <p className="text-sm font-normal text-gray-300 text-center">
+        {text}
+      </p>
+    </div>
+  );
+}
 
 function Navbar() {
   return (
     <nav className="bg-[#080c1a] w-full shrink-0">
-
-      <div className="w-full px-6 md:px-10 lg:px-14 py-5 flex items-center justify-between">
-
+      <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 md:px-8 lg:px-10 py-3 flex items-center justify-between">
         <Link
           href="/dashboard"
-          className="flex items-center gap-4"
+          className="flex items-center gap-3 min-w-0"
         >
-
-          <div className="w-14 h-14 rounded-xl bg-cyan-400/10 flex items-center justify-center">
-
+          <div className="w-10 h-10 rounded-lg bg-cyan-400/10 flex items-center justify-center shrink-0">
             <FontAwesomeIcon
               icon={faBrain}
-              className="text-cyan-400 text-2xl"
+              className="text-cyan-400 text-lg"
             />
-
           </div>
 
-          <div>
-
-            <h1 className="text-2xl md:text-3xl font-bold">
+          <div className="min-w-0">
+            <h1 className="text-xl sm:text-2xl font-normal">
               Talent<span className="text-cyan-400">IQ</span>
             </h1>
 
-            <p className="text-xs text-gray-500">
+            <p className="text-[9px] text-gray-500">
               TALENT INTELLIGENCE
             </p>
-
           </div>
-
         </Link>
 
         <Link
           href="/"
-          className="flex items-center gap-2 text-lg text-gray-400 hover:text-white transition"
+          className="flex items-center gap-2 text-sm text-gray-400 hover:text-white transition"
         >
-
           <FontAwesomeIcon
             icon={faRightFromBracket}
+            className="text-xs"
           />
 
           <span className="hidden sm:block">
             Logout
           </span>
-
         </Link>
-
       </div>
-
     </nav>
   );
 }
 
-/* FOOTER */
-
 function Footer() {
   return (
-    <footer className="fixed bottom-0 left-0 w-full bg-[#080c1a] py-3 text-center text-gray-600 text-sm z-50">
+    <footer className="w-full bg-[#080c1a] py-3 text-center text-gray-600 text-[11px] sm:text-xs mt-8">
       TalentIQ — AI-Powered Recruitment Platform
     </footer>
   );

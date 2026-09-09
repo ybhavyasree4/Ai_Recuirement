@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useEffect, useState } from "react";
@@ -28,9 +27,6 @@ export default function Dashboard() {
   useEffect(() => {
     let mounted = true;
 
-    // =========================
-    // LOAD CACHED DATA FIRST
-    // =========================
     const saved = sessionStorage.getItem("dashboardData");
 
     if (saved) {
@@ -41,8 +37,6 @@ export default function Dashboard() {
           setCandidates(data.candidates || []);
           setJobs(data.jobs || []);
           setApplications(data.applications || []);
-
-          // Don't show loading screen when cached data exists
           setLoading(false);
         }
       } catch {
@@ -50,9 +44,6 @@ export default function Dashboard() {
       }
     }
 
-    // =========================
-    // REFRESH IN BACKGROUND
-    // =========================
     fetchData(mounted);
 
     return () => {
@@ -60,12 +51,8 @@ export default function Dashboard() {
     };
   }, []);
 
-  // =========================
-  // FETCH DASHBOARD DATA
-  // =========================
   async function fetchData(mounted = true) {
     try {
-      // Start all requests simultaneously
       const requests = await Promise.allSettled([
         fetch(`${API_URL}/candidates`),
         fetch(`${API_URL}/jobs`),
@@ -75,10 +62,9 @@ export default function Dashboard() {
       const [candidateResponse, jobResponse, applicationResponse] =
         requests;
 
-      // =========================
-      // CANDIDATES
-      // =========================
       let candidatesData = candidates;
+      let jobsData = jobs;
+      let applicationsData = applications;
 
       if (
         candidateResponse.status === "fulfilled" &&
@@ -87,22 +73,12 @@ export default function Dashboard() {
         candidatesData = await candidateResponse.value.json();
       }
 
-      // =========================
-      // JOBS
-      // =========================
-      let jobsData = jobs;
-
       if (
         jobResponse.status === "fulfilled" &&
         jobResponse.value.ok
       ) {
         jobsData = await jobResponse.value.json();
       }
-
-      // =========================
-      // APPLICATIONS
-      // =========================
-      let applicationsData = applications;
 
       if (
         applicationResponse.status === "fulfilled" &&
@@ -113,16 +89,10 @@ export default function Dashboard() {
 
       if (!mounted) return;
 
-      // =========================
-      // UPDATE STATE
-      // =========================
       setCandidates(candidatesData || []);
       setJobs(jobsData || []);
       setApplications(applicationsData || []);
 
-      // =========================
-      // SAVE CACHE
-      // =========================
       sessionStorage.setItem(
         "dashboardData",
         JSON.stringify({
@@ -138,9 +108,7 @@ export default function Dashboard() {
 
       if (!mounted) return;
 
-      // Only show error if there is no cached data
-      const cachedData =
-        sessionStorage.getItem("dashboardData");
+      const cachedData = sessionStorage.getItem("dashboardData");
 
       if (!cachedData) {
         setError(
@@ -157,6 +125,7 @@ export default function Dashboard() {
   // =========================
   // SHORTLISTED COUNT
   // =========================
+
   const shortlistedCount = applications.filter((app) => {
     if (!app.recommendation) return false;
 
@@ -185,6 +154,7 @@ export default function Dashboard() {
   // =========================
   // SUMMARY CARDS
   // =========================
+
   const cards = [
     [
       faUsers,
@@ -219,6 +189,7 @@ export default function Dashboard() {
   // =========================
   // RECRUITMENT FEATURES
   // =========================
+
   const features = [
     [
       faFileCircleCheck,
@@ -259,29 +230,30 @@ export default function Dashboard() {
   ];
 
   return (
-    <main className="min-h-screen bg-[#050816] text-white flex flex-col">
+    <main className="min-h-screen bg-[#050816] text-white flex flex-col overflow-x-hidden">
 
       {/* =========================
           NAVBAR
       ========================= */}
-      <nav className="bg-[#080c1a] px-5 sm:px-7 md:px-10 py-4">
-        <div className="flex justify-between items-center">
+
+      <nav className="bg-[#080c1a] px-4 sm:px-6 md:px-8 py-3">
+        <div className="flex justify-between items-center gap-4">
 
           <Link
             href="/dashboard"
-            className="flex items-center gap-3"
+            className="flex items-center gap-2.5 min-w-0"
           >
             <FontAwesomeIcon
               icon={faBrain}
-              className="text-cyan-400 text-2xl"
+              className="text-cyan-400 text-lg sm:text-xl shrink-0"
             />
 
-            <div>
-              <h1 className="text-2xl font-bold">
+            <div className="min-w-0">
+              <h1 className="text-lg sm:text-xl font-bold">
                 Talent<span className="text-cyan-400">IQ</span>
               </h1>
 
-              <p className="text-[10px] text-gray-500">
+              <p className="text-[9px] sm:text-[10px] text-gray-500">
                 TALENT INTELLIGENCE
               </p>
             </div>
@@ -289,10 +261,10 @@ export default function Dashboard() {
 
           <Link
             href="/"
-            className="flex items-center gap-2 text-gray-400 hover:text-white text-base"
+            className="flex items-center gap-1.5 text-gray-400 hover:text-white text-xs sm:text-sm shrink-0 transition"
           >
             <FontAwesomeIcon icon={faRightFromBracket} />
-            Logout
+            <span>Logout</span>
           </Link>
 
         </div>
@@ -301,28 +273,31 @@ export default function Dashboard() {
       {/* =========================
           MAIN
       ========================= */}
-      <section className="flex-1 px-5 sm:px-7 md:px-10 lg:px-14 py-8 pb-20">
+
+      <section className="flex-1 w-full px-4 sm:px-6 md:px-8 lg:px-10 py-6 sm:py-7 pb-12">
 
         {/* HEADER */}
-        <div className="mb-8">
 
-          <p className="text-cyan-400 text-sm font-semibold uppercase">
+        <div className="mb-6">
+
+          <p className="text-cyan-400 text-xs sm:text-sm font-semibold uppercase">
             Recruiter Dashboard
           </p>
 
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold mt-2">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mt-1.5 break-words">
             Hiring Workspace
           </h2>
 
-          <p className="text-gray-400 text-base md:text-lg mt-2">
+          <p className="text-gray-400 text-sm sm:text-base mt-1.5">
             Manage candidates, jobs and applications from one place.
           </p>
 
         </div>
 
         {/* ERROR */}
+
         {error && (
-          <div className="mb-5 p-4 rounded-xl bg-red-500/10 text-red-400">
+          <div className="mb-5 p-3 rounded-xl bg-red-500/10 text-red-400 text-sm">
             {error}
           </div>
         )}
@@ -330,12 +305,14 @@ export default function Dashboard() {
         {/* =========================
             SUMMARY
         ========================= */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
 
           {cards.map((card) => (
             <Link
               href={card[4]}
               key={card[1]}
+              className="min-w-0"
             >
               <DashboardCard
                 icon={card[0]}
@@ -355,22 +332,24 @@ export default function Dashboard() {
         {/* =========================
             TOOLS
         ========================= */}
-        <div className="mt-12">
 
-          <p className="text-cyan-400 text-sm font-semibold uppercase">
+        <div className="mt-9">
+
+          <p className="text-cyan-400 text-xs sm:text-sm font-semibold uppercase">
             Recruitment Tools
           </p>
 
-          <h3 className="text-2xl sm:text-3xl font-bold mt-2 mb-6">
+          <h3 className="text-xl sm:text-2xl font-bold mt-1.5 mb-5">
             Manage your hiring workflow
           </h3>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
 
             {features.map((feature) => (
               <Link
                 href={feature[3]}
                 key={feature[1]}
+                className="min-w-0"
               >
                 <FeatureCard
                   icon={feature[0]}
@@ -389,7 +368,8 @@ export default function Dashboard() {
       {/* =========================
           FOOTER
       ========================= */}
-      <footer className="bg-[#080c1a] py-4 text-center text-gray-600 text-sm">
+
+      <footer className="w-full bg-[#080c1a] py-3 text-center text-gray-600 text-[11px] sm:text-xs">
         TalentIQ — AI-Powered Recruitment Platform
       </footer>
 
@@ -408,22 +388,22 @@ function DashboardCard({
   description,
 }) {
   return (
-    <div className="bg-[#0b1020] rounded-xl p-5 min-h-[175px] hover:bg-[#0e1428] transition">
+    <div className="bg-[#0b1020] rounded-xl p-4 min-h-[150px] h-full hover:bg-[#0e1428] transition overflow-hidden">
 
       <FontAwesomeIcon
         icon={icon}
-        className="text-cyan-400 text-xl mb-4"
+        className="text-cyan-400 text-lg mb-3"
       />
 
-      <p className="text-base text-gray-500">
+      <p className="text-sm text-gray-500">
         {title}
       </p>
 
-      <p className="text-3xl font-bold mt-1">
+      <p className="text-2xl font-bold mt-1 break-words">
         {value}
       </p>
 
-      <p className="text-sm text-gray-600 mt-2">
+      <p className="text-xs text-gray-600 mt-1.5 break-words">
         {description}
       </p>
 
@@ -441,18 +421,18 @@ function FeatureCard({
   text,
 }) {
   return (
-    <div className="bg-[#0b1020] rounded-xl p-6 min-h-[205px] hover:bg-[#0e1428] transition">
+    <div className="bg-[#0b1020] rounded-xl p-5 min-h-[175px] h-full hover:bg-[#0e1428] transition overflow-hidden">
 
       <FontAwesomeIcon
         icon={icon}
-        className="text-cyan-400 text-xl mb-5"
+        className="text-cyan-400 text-lg mb-4"
       />
 
-      <h4 className="text-xl font-bold">
+      <h4 className="text-base sm:text-lg font-bold break-words">
         {title}
       </h4>
 
-      <p className="text-gray-400 text-base mt-3 leading-6">
+      <p className="text-gray-400 text-sm mt-2 leading-5 break-words">
         {text}
       </p>
 

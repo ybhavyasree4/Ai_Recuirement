@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends, UploadFile, File, HTTPException
+from fastapi import FastAPI, Depends, UploadFile, File, HTTPException, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -80,19 +80,6 @@ def get_db():
 async def home():
     return {
         "message": "AI Recruitment Platform API is running"
-    }
-
-
-@app.get("/test-email")
-def test_email():
-    send_email(
-        "YOUR_EMAIL@gmail.com",
-        "AI Recruitment Test",
-        "SMTP email is working successfully!"
-    )
-
-    return {
-        "message": "Test email sent successfully"
     }
 
 
@@ -368,6 +355,7 @@ def google_login(
 @app.post("/forgot-password")
 def forgot_password(
     data: ForgotPasswordRequest,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     user = db.query(User).filter(
@@ -394,10 +382,9 @@ def forgot_password(
 
     db.commit()
 
-    send_email(
-        user.email,
-        "AI Recruitment - Password Reset OTP",
-        f"""
+    subject = "AI Recruitment - Password Reset OTP"
+
+    message = f"""
 Hello {user.name},
 
 You requested to reset your password.
@@ -413,6 +400,12 @@ If you did not request this, please ignore this email.
 Regards,
 AI Recruitment Platform
 """
+
+    background_tasks.add_task(
+        send_email,
+        user.email,
+        subject,
+        message
     )
 
     return {

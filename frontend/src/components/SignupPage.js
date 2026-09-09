@@ -14,7 +14,6 @@ export default function Signup() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
-  // Normal Signup
   const handleSignup = async (e) => {
     e.preventDefault();
 
@@ -64,7 +63,6 @@ export default function Signup() {
     }
   };
 
-  // Google Signup
   const handleGoogleSignup = async (credentialResponse) => {
     if (googleLoading || loading) return;
 
@@ -98,7 +96,6 @@ export default function Signup() {
         return;
       }
 
-      // Google authentication successful
       router.replace("/dashboard");
     } catch (error) {
       console.error("Google signup error:", error);
@@ -111,25 +108,21 @@ export default function Signup() {
     <GoogleOAuthProvider
       clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID}
     >
-      <main className="min-h-screen bg-black text-white flex items-center justify-center px-4 sm:px-6 py-8">
+      <main className="min-h-screen bg-black text-white flex items-center justify-center px-4 sm:px-6 py-6">
+        <div className="w-full max-w-sm bg-black border border-slate-800 rounded-xl p-5 sm:p-6 shadow-xl">
 
-        <div className="w-full max-w-md bg-black border border-slate-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-xl">
-
-          {/* Heading */}
-          <h1 className="text-2xl sm:text-3xl font-bold text-center">
+          <h1 className="text-xl sm:text-2xl font-normal text-center">
             Create Account
           </h1>
 
-          <p className="text-slate-400 text-sm sm:text-base text-center mt-2 mb-6">
+          <p className="text-slate-400 text-xs sm:text-sm text-center mt-1 mb-5">
             Join TalentIQ
           </p>
 
-          {/* Normal Signup Form */}
-          <form onSubmit={handleSignup} className="space-y-5">
+          <form onSubmit={handleSignup} className="space-y-4">
 
-            {/* Name */}
             <div>
-              <label className="block text-sm sm:text-base mb-2">
+              <label className="block text-xs sm:text-sm mb-1.5">
                 Name
               </label>
 
@@ -140,13 +133,12 @@ export default function Signup() {
                 placeholder="Enter your name"
                 autoComplete="name"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm sm:text-base text-white placeholder-slate-500 outline-none focus:border-cyan-400 transition"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 outline-none focus:border-cyan-400 transition"
               />
             </div>
 
-            {/* Email */}
             <div>
-              <label className="block text-sm sm:text-base mb-2">
+              <label className="block text-xs sm:text-sm mb-1.5">
                 Email
               </label>
 
@@ -157,13 +149,12 @@ export default function Signup() {
                 placeholder="Enter your email"
                 autoComplete="email"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm sm:text-base text-white placeholder-slate-500 outline-none focus:border-cyan-400 transition"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 outline-none focus:border-cyan-400 transition"
               />
             </div>
 
-            {/* Password */}
             <div>
-              <label className="block text-sm sm:text-base mb-2">
+              <label className="block text-xs sm:text-sm mb-1.5">
                 Password
               </label>
 
@@ -174,41 +165,32 @@ export default function Signup() {
                 placeholder="Enter your password"
                 autoComplete="new-password"
                 required
-                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-4 py-3 text-sm sm:text-base text-white placeholder-slate-500 outline-none focus:border-cyan-400 transition"
+                className="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2.5 text-xs sm:text-sm text-white placeholder-slate-500 outline-none focus:border-cyan-400 transition"
               />
             </div>
 
-            {/* Create Account Button */}
             <button
               type="submit"
               disabled={loading || googleLoading}
-              className="w-full bg-cyan-400 hover:bg-cyan-300 disabled:opacity-60 text-black py-3 rounded-lg font-semibold text-sm sm:text-base transition"
+              className="w-full bg-cyan-400 hover:bg-cyan-300 disabled:opacity-60 text-black py-2.5 rounded-lg font-normal text-xs sm:text-sm transition"
             >
-              {loading
-                ? "Creating Account..."
-                : "Create Account"}
+              {loading ? "Creating Account..." : "Create Account"}
             </button>
-
           </form>
 
-          {/* OR Divider */}
-          <div className="flex items-center gap-3 my-6">
-
+          <div className="flex items-center gap-3 my-5">
             <div className="h-px bg-slate-700 flex-1"></div>
 
-            <span className="text-slate-500 text-sm">
+            <span className="text-slate-500 text-xs">
               OR
             </span>
 
             <div className="h-px bg-slate-700 flex-1"></div>
-
           </div>
 
-          {/* Google Signup */}
           <div className="flex justify-center">
-
             {googleLoading ? (
-              <p className="text-slate-400 text-sm">
+              <p className="text-slate-400 text-xs">
                 Signing up with Google...
               </p>
             ) : (
@@ -226,13 +208,10 @@ export default function Signup() {
                 shape="rectangular"
               />
             )}
-
           </div>
 
-          {/* Login Link */}
-          <p className="text-center text-slate-400 text-sm sm:text-base mt-6">
+          <p className="text-center text-slate-400 text-xs sm:text-sm mt-5">
             Already have an account?{" "}
-
             <Link
               href="/login"
               className="text-cyan-400 hover:text-cyan-300"
@@ -241,18 +220,14 @@ export default function Signup() {
             </Link>
           </p>
 
-          {/* Back to Home */}
-          <div className="text-center mt-4">
-
+          <div className="text-center mt-3">
             <Link
               href="/"
-              className="text-sm sm:text-base text-slate-500 hover:text-white transition"
+              className="text-xs sm:text-sm text-slate-500 hover:text-white transition"
             >
               Back to Home
             </Link>
-
           </div>
-
         </div>
       </main>
     </GoogleOAuthProvider>
