@@ -1,5 +1,5 @@
-from database import SessionLocal
-from models import JobApplication, CandidateSkill, JobSkill
+from backend.database import SessionLocal
+from backend.models import JobApplication, CandidateSkill, JobSkill
 import re
 
 db = SessionLocal()

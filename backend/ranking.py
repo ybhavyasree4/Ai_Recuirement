@@ -1,5 +1,5 @@
-from database import SessionLocal
-from models import JobApplication, Job, Candidate
+from backend.database import SessionLocal
+from backend.models import JobApplication, Job, Candidate
 import ast
 
 

@@ -10,14 +10,13 @@ import random
 import os
 
 from dotenv import load_dotenv
-
 from google.oauth2 import id_token
 from google.auth.transport import requests
 
-from database import SessionLocal
-from models import User, Candidate, Job, JobApplication
+from backend.database import SessionLocal
+from backend.models import User, Candidate, Job, JobApplication
 
-from schemas import (
+from backend.schemas import (
     SignupRequest,
     LoginRequest,
     VerifyEmailRequest,
@@ -25,28 +24,20 @@ from schemas import (
     ResetPasswordRequest
 )
 
-from email_service import send_email
-
-from upload_resume import process_single_resume
-from candidate_profiling import profile_candidate
-from candidate_matching import match_candidate
-from skill_gap import analyze_candidate_skill_gaps
-from ranking import generate_rankings
-from ai_recommendation import generate_ai_recommendations
+from backend.email_service import send_email
+from backend.upload_resume import process_single_resume
+from backend.candidate_profiling import profile_candidate
+from backend.candidate_matching import match_candidate
+from backend.skill_gap import analyze_candidate_skill_gaps
+from backend.ranking import generate_rankings
+from backend.ai_recommendation import generate_ai_recommendations
 
 
 # ============================================================
-# LOAD .ENV FROM OUTSIDE BACKEND
+# LOAD .ENV
 # ============================================================
-
-# main.py is inside:
-# AI_Recuirement/backend/main.py
-#
-# .env is inside:
-# AI_Recuirement/.env
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 ENV_FILE = BASE_DIR / ".env"
 
 load_dotenv(dotenv_path=ENV_FILE)
@@ -57,7 +48,9 @@ load_dotenv(dotenv_path=ENV_FILE)
 # ============================================================
 
 app = FastAPI(
-    title="AI Recruitment Platform"
+    title="AI Recruitment Platform",
+    description="AI-powered recruitment and talent intelligence platform",
+    version="1.0.0"
 )
 
 
@@ -82,7 +75,6 @@ app.add_middleware(
 # ============================================================
 
 def get_db():
-
     db = SessionLocal()
 
     try:
@@ -97,8 +89,7 @@ def get_db():
 # ============================================================
 
 @app.get("/")
-def home():
-
+async def home():
     return {
         "message": "AI Recruitment Platform API is running"
     }
@@ -137,7 +128,6 @@ def signup(
     ).first()
 
     if existing:
-
         raise HTTPException(
             status_code=400,
             detail="Email already registered"
@@ -208,20 +198,17 @@ def verify_email(
     ).first()
 
     if not user:
-
         raise HTTPException(
             status_code=404,
             detail="User not found"
         )
 
     if user.is_verified == 1:
-
         return {
             "message": "Email already verified"
         }
 
     if user.verification_otp != data.otp:
-
         raise HTTPException(
             status_code=400,
             detail="Invalid OTP"
@@ -252,21 +239,18 @@ def login(
     ).first()
 
     if not user:
-
         raise HTTPException(
             status_code=401,
             detail="Invalid email or password"
         )
 
     if user.is_verified != 1:
-
         raise HTTPException(
             status_code=403,
             detail="Please verify your email before login"
         )
 
     if not user.password:
-
         raise HTTPException(
             status_code=401,
             detail="This account uses Google login. Please continue with Google."
@@ -284,7 +268,6 @@ def login(
         valid = False
 
     if not valid:
-
         raise HTTPException(
             status_code=401,
             detail="Invalid email or password"
@@ -311,19 +294,16 @@ def google_login(
     credential = data.get("credential")
 
     if not credential:
-
         raise HTTPException(
             status_code=400,
             detail="Google credential is required"
         )
 
-    # Read Google Client ID from root .env
     google_client_id = os.getenv(
         "GOOGLE_CLIENT_ID"
     )
 
     if not google_client_id:
-
         raise HTTPException(
             status_code=500,
             detail="Google Client ID is not configured"
@@ -331,24 +311,14 @@ def google_login(
 
     try:
 
-        # ====================================================
-        # VERIFY GOOGLE ID TOKEN
-        # ====================================================
-
         google_data = id_token.verify_oauth2_token(
             credential,
             requests.Request(),
             google_client_id
         )
 
-        # ====================================================
-        # GET GOOGLE DATA
-        # ====================================================
-
         google_id = google_data.get("sub")
-
         email = google_data.get("email")
-
         name = google_data.get("name")
 
         email_verified = google_data.get(
@@ -356,42 +326,27 @@ def google_login(
             False
         )
 
-        # ====================================================
-        # VALIDATE GOOGLE DATA
-        # ====================================================
-
         if not google_id:
-
             raise HTTPException(
                 status_code=400,
                 detail="Google account ID not found"
             )
 
         if not email:
-
             raise HTTPException(
                 status_code=400,
                 detail="Google email not found"
             )
 
         if not email_verified:
-
             raise HTTPException(
                 status_code=400,
                 detail="Google email is not verified"
             )
 
-        # ====================================================
-        # FIND USER BY GOOGLE ID
-        # ====================================================
-
         user = db.query(User).filter(
             User.google_id == google_id
         ).first()
-
-        # ====================================================
-        # IF NOT FOUND, FIND BY EMAIL
-        # ====================================================
 
         if not user:
 
@@ -399,29 +354,17 @@ def google_login(
                 User.email == email
             ).first()
 
-        # ====================================================
-        # EXISTING USER
-        # ====================================================
-
         if user:
 
             user.google_id = google_id
-
             user.is_verified = 1
-
             user.verification_otp = None
 
             if not user.name:
-
                 user.name = name or "Google User"
 
             db.commit()
-
             db.refresh(user)
-
-        # ====================================================
-        # NEW GOOGLE USER
-        # ====================================================
 
         else:
 
@@ -436,14 +379,8 @@ def google_login(
             )
 
             db.add(user)
-
             db.commit()
-
             db.refresh(user)
-
-        # ====================================================
-        # SUCCESS
-        # ====================================================
 
         return {
             "message": "Google login successful",
@@ -492,14 +429,12 @@ def forgot_password(
     ).first()
 
     if not user:
-
         raise HTTPException(
             status_code=404,
             detail="Email not registered"
         )
 
     if not user.password:
-
         raise HTTPException(
             status_code=400,
             detail="This account uses Google login. Please continue with Google."
@@ -554,14 +489,12 @@ def reset_password(
     ).first()
 
     if not user:
-
         raise HTTPException(
             status_code=404,
             detail="User not found"
         )
 
     if user.reset_otp != data.otp:
-
         raise HTTPException(
             status_code=400,
             detail="Invalid OTP"
@@ -573,7 +506,6 @@ def reset_password(
     ).decode("utf-8")
 
     user.password = password
-
     user.reset_otp = None
 
     db.commit()
@@ -616,7 +548,6 @@ def get_candidate(
     ).first()
 
     if not candidate:
-
         raise HTTPException(
             status_code=404,
             detail="Candidate not found"
@@ -642,7 +573,6 @@ def get_candidate_profile(
     ).first()
 
     if not candidate:
-
         raise HTTPException(
             status_code=404,
             detail="Candidate not found"
@@ -733,7 +663,6 @@ def get_job(
     ).first()
 
     if not job:
-
         raise HTTPException(
             status_code=404,
             detail="Job not found"
@@ -868,7 +797,6 @@ async def upload_resume(
     finally:
 
         if temp_file.exists():
-
             temp_file.unlink()
 
 

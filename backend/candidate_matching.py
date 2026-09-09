@@ -1,6 +1,6 @@
-from semantic_search import get_similarity
+from backend.semantic_search import get_similarity
 
-from models import (
+from backend.models import (
     Candidate,
     Job,
     CandidateSkill,

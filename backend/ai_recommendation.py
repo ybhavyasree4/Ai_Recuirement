@@ -6,9 +6,9 @@ from dotenv import load_dotenv
 from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 
-from models import JobApplication
-from ai_retrieval import get_candidate_job_data
-from rag_context import build_rag_context
+from backend.models import JobApplication
+from backend.ai_retrieval import get_candidate_job_data
+from backend.rag_context import build_rag_context
 
 
 # ============================================================

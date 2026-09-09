@@ -2,8 +2,8 @@ import ast
 import re
 import pandas as pd
 
-from database import SessionLocal
-from models import Candidate, CandidateSkill, Job, JobSkill, JobApplication
+from backend.database import SessionLocal
+from backend.models import Candidate, CandidateSkill, Job, JobSkill, JobApplication
 
 
 CSV_FILE = "resume_data_for_ranking.csv"

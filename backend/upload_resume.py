@@ -6,8 +6,8 @@ import cloudinary.uploader
 from dotenv import load_dotenv
 from pypdf import PdfReader
 
-from database import SessionLocal
-from models import Candidate
+from backend.database import SessionLocal
+from backend.models import Candidate
 
 
 # Load .env

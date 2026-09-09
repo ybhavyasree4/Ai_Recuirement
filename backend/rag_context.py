@@ -1,5 +1,5 @@
 import ast
-from ai_retrieval import get_candidate_job_data
+from backend.ai_retrieval import get_candidate_job_data
 
 
 def clean_value(value):

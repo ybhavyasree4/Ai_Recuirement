@@ -1,6 +1,6 @@
 import re
-from database import SessionLocal
-from models import Candidate, CandidateSkill
+from backend.database import SessionLocal
+from backend.models import Candidate, CandidateSkill
 
 SKILLS = [
     "Python", "Java", "SQL", "HTML", "CSS", "JavaScript", "C", "C++", "C#",

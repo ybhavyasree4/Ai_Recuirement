@@ -1,5 +1,5 @@
-from database import SessionLocal
-from models import Candidate, Job, CandidateSkill, JobSkill, JobApplication
+from backend.database import SessionLocal
+from backend.models import Candidate, Job, CandidateSkill, JobSkill, JobApplication
 
 
 def get_candidate_job_data(candidate_id, job_id):
