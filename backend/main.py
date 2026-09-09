@@ -121,10 +121,11 @@ def signup(
     db.commit()
     db.refresh(user)
 
-    send_email(
-        user.email,
-        "AI Recruitment - Email Verification",
-        f"""
+    try:
+        send_email(
+            user.email,
+            "AI Recruitment - Email Verification",
+            f"""
 Hello {user.name},
 
 Thank you for signing up for the AI Recruitment Platform.
@@ -138,7 +139,23 @@ Enter this OTP in the verification page to verify your email.
 Regards,
 AI Recruitment Platform
 """
-    )
+        )
+    except Exception as e:
+        db.rollback()
+
+        print(
+            "SIGNUP EMAIL ERROR TYPE:",
+            type(e).__name__
+        )
+        print(
+            "SIGNUP EMAIL ERROR:",
+            repr(e)
+        )
+
+        raise HTTPException(
+            status_code=500,
+            detail="Unable to send verification email. Please try again."
+        )
 
     return {
         "message": "Signup successful. Verification OTP sent to your email.",
@@ -343,7 +360,12 @@ def google_login(
         db.rollback()
 
         print(
-            f"GOOGLE LOGIN ERROR: {e}"
+            "GOOGLE LOGIN ERROR TYPE:",
+            type(e).__name__
+        )
+        print(
+            "GOOGLE LOGIN ERROR:",
+            repr(e)
         )
 
         raise HTTPException(
@@ -377,9 +399,6 @@ def forgot_password(
         random.randint(100000, 999999)
     )
 
-    user.reset_otp = otp
-    db.commit()
-
     subject = "AI Recruitment - Password Reset OTP"
 
     message = f"""
@@ -406,6 +425,9 @@ AI Recruitment Platform
             message
         )
 
+        user.reset_otp = otp
+        db.commit()
+
         return {
             "message": "Password reset OTP sent to your email."
         }
@@ -414,7 +436,12 @@ AI Recruitment Platform
         db.rollback()
 
         print(
-            f"PASSWORD RESET EMAIL ERROR: {e}"
+            "PASSWORD RESET EMAIL ERROR TYPE:",
+            type(e).__name__
+        )
+        print(
+            "PASSWORD RESET EMAIL ERROR:",
+            repr(e)
         )
 
         raise HTTPException(
@@ -547,7 +574,12 @@ def get_candidate_profile(
         db.rollback()
 
         print(
-            f"PROFILE ERROR for candidate {candidate_id}: {e}"
+            "PROFILE ERROR TYPE:",
+            type(e).__name__
+        )
+        print(
+            f"PROFILE ERROR for candidate {candidate_id}:",
+            repr(e)
         )
 
         raise HTTPException(
@@ -634,6 +666,12 @@ def get_dashboard_stats(
 async def upload_resume(
     file: UploadFile = File(...)
 ):
+    if not file.filename:
+        raise HTTPException(
+            status_code=400,
+            detail="File name is required"
+        )
+
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(
             status_code=400,
@@ -685,6 +723,15 @@ async def upload_resume(
         }
 
     except Exception as e:
+        print(
+            "UPLOAD RESUME ERROR TYPE:",
+            type(e).__name__
+        )
+        print(
+            "UPLOAD RESUME ERROR:",
+            repr(e)
+        )
+
         raise HTTPException(
             status_code=500,
             detail=str(e)
@@ -726,6 +773,15 @@ def match_api(
     except Exception as e:
         db.rollback()
 
+        print(
+            "MATCH ERROR TYPE:",
+            type(e).__name__
+        )
+        print(
+            "MATCH ERROR:",
+            repr(e)
+        )
+
         raise HTTPException(
             status_code=500,
             detail=str(e)
@@ -762,6 +818,15 @@ def skill_gap_api(
 
     except Exception as e:
         db.rollback()
+
+        print(
+            "SKILL GAP ERROR TYPE:",
+            type(e).__name__
+        )
+        print(
+            "SKILL GAP ERROR:",
+            repr(e)
+        )
 
         raise HTTPException(
             status_code=500,
@@ -804,6 +869,15 @@ def ranking_api(
 
     except Exception as e:
         db.rollback()
+
+        print(
+            "RANKING ERROR TYPE:",
+            type(e).__name__
+        )
+        print(
+            "RANKING ERROR:",
+            repr(e)
+        )
 
         raise HTTPException(
             status_code=500,
@@ -879,6 +953,15 @@ def ai_recommendations(
 
     except Exception as e:
         db.rollback()
+
+        print(
+            "AI RECOMMENDATION ERROR TYPE:",
+            type(e).__name__
+        )
+        print(
+            "AI RECOMMENDATION ERROR:",
+            repr(e)
+        )
 
         raise HTTPException(
             status_code=500,

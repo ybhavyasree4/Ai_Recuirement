@@ -12,8 +12,22 @@ def send_email(to_email, subject, body):
     smtp_username = os.getenv("SMTP_USERNAME")
     smtp_password = os.getenv("SMTP_PASSWORD")
 
-    if not smtp_host or not smtp_port or not smtp_username or not smtp_password:
-        raise Exception("SMTP environment variables are missing")
+    if not smtp_host:
+        raise Exception("SMTP_HOST is missing")
+
+    if not smtp_port:
+        raise Exception("SMTP_PORT is missing")
+
+    if not smtp_username:
+        raise Exception("SMTP_USERNAME is missing")
+
+    if not smtp_password:
+        raise Exception("SMTP_PASSWORD is missing")
+
+    try:
+        port = int(smtp_port)
+    except ValueError:
+        raise Exception("SMTP_PORT must be a number")
 
     message = EmailMessage()
     message["From"] = smtp_username
@@ -22,13 +36,35 @@ def send_email(to_email, subject, body):
     message.set_content(body)
 
     try:
-        with smtplib.SMTP(smtp_host, int(smtp_port), timeout=30) as server:
+        print(f"Connecting to SMTP server: {smtp_host}:{port}")
+        print(f"SMTP username: {smtp_username}")
+        print(f"Sending email to: {to_email}")
+
+        with smtplib.SMTP(
+            smtp_host,
+            port,
+            timeout=30
+        ) as server:
+
+            server.ehlo()
+
+            print("Starting TLS...")
             server.starttls()
-            server.login(smtp_username, smtp_password)
+
+            server.ehlo()
+
+            print("Logging into SMTP server...")
+            server.login(
+                smtp_username,
+                smtp_password
+            )
+
+            print("Sending email...")
             server.send_message(message)
 
         print(f"Email sent successfully to {to_email}")
 
     except Exception as e:
-        print("Email sending failed:", str(e))
+        print("EMAIL ERROR TYPE:", type(e).__name__)
+        print("EMAIL ERROR:", repr(e))
         raise
