@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function ResetPassword() {
+function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -65,6 +65,8 @@ export default function ResetPassword() {
   return (
     <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 sm:px-6 py-8">
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-xl">
+
+        {/* Heading */}
         <h1 className="text-2xl sm:text-3xl font-bold text-center">
           Reset Password
         </h1>
@@ -73,7 +75,10 @@ export default function ResetPassword() {
           Enter the OTP and your new password
         </p>
 
+        {/* Form */}
         <form onSubmit={handleResetPassword} className="space-y-5">
+
+          {/* Email */}
           <div>
             <label className="block text-sm sm:text-base mb-2">
               Email
@@ -90,6 +95,7 @@ export default function ResetPassword() {
             />
           </div>
 
+          {/* OTP */}
           <div>
             <label className="block text-sm sm:text-base mb-2">
               OTP
@@ -100,7 +106,9 @@ export default function ResetPassword() {
               value={otp}
               onChange={(e) =>
                 setOtp(
-                  e.target.value.replace(/\D/g, "").slice(0, 6)
+                  e.target.value
+                    .replace(/\D/g, "")
+                    .slice(0, 6)
                 )
               }
               placeholder="Enter 6-digit OTP"
@@ -111,6 +119,7 @@ export default function ResetPassword() {
             />
           </div>
 
+          {/* New Password */}
           <div>
             <label className="block text-sm sm:text-base mb-2">
               New Password
@@ -127,6 +136,7 @@ export default function ResetPassword() {
             />
           </div>
 
+          {/* Reset Button */}
           <button
             type="submit"
             disabled={loading}
@@ -136,6 +146,7 @@ export default function ResetPassword() {
           </button>
         </form>
 
+        {/* Back to Login */}
         <div className="text-center mt-6">
           <Link
             href="/login"
@@ -145,6 +156,7 @@ export default function ResetPassword() {
           </Link>
         </div>
 
+        {/* Back to Home */}
         <div className="text-center mt-4">
           <Link
             href="/"
@@ -153,7 +165,22 @@ export default function ResetPassword() {
             Back to Home
           </Link>
         </div>
+
       </div>
     </main>
+  );
+}
+
+export default function ResetPassword() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+          <p className="text-slate-400">Loading...</p>
+        </main>
+      }
+    >
+      <ResetPasswordForm />
+    </Suspense>
   );
 }

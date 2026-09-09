@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 
-export default function VerifyEmail() {
+function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -63,6 +63,7 @@ export default function VerifyEmail() {
   return (
     <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-4 sm:px-6 py-8">
       <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-xl">
+        
         <h1 className="text-2xl sm:text-3xl font-bold text-center">
           Verify Email
         </h1>
@@ -72,6 +73,8 @@ export default function VerifyEmail() {
         </p>
 
         <form onSubmit={handleVerify} className="space-y-5">
+
+          {/* Email */}
           <div>
             <label className="block text-sm sm:text-base mb-2">
               Email
@@ -88,6 +91,7 @@ export default function VerifyEmail() {
             />
           </div>
 
+          {/* OTP */}
           <div>
             <label className="block text-sm sm:text-base mb-2">
               OTP
@@ -98,7 +102,9 @@ export default function VerifyEmail() {
               value={otp}
               onChange={(e) =>
                 setOtp(
-                  e.target.value.replace(/\D/g, "").slice(0, 6)
+                  e.target.value
+                    .replace(/\D/g, "")
+                    .slice(0, 6)
                 )
               }
               placeholder="Enter 6-digit OTP"
@@ -109,6 +115,7 @@ export default function VerifyEmail() {
             />
           </div>
 
+          {/* Verify Button */}
           <button
             type="submit"
             disabled={loading}
@@ -118,6 +125,7 @@ export default function VerifyEmail() {
           </button>
         </form>
 
+        {/* Login */}
         <p className="text-center text-slate-400 text-sm sm:text-base mt-6">
           Already verified?{" "}
           <Link
@@ -128,6 +136,7 @@ export default function VerifyEmail() {
           </Link>
         </p>
 
+        {/* Home */}
         <div className="text-center mt-4">
           <Link
             href="/"
@@ -136,7 +145,22 @@ export default function VerifyEmail() {
             Back to Home
           </Link>
         </div>
+
       </div>
     </main>
+  );
+}
+
+export default function VerifyEmail() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-slate-950 text-white flex items-center justify-center">
+          <p className="text-slate-400">Loading...</p>
+        </main>
+      }
+    >
+      <VerifyEmailForm />
+    </Suspense>
   );
 }
