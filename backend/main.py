@@ -33,19 +33,11 @@ from backend.ranking import generate_rankings
 from backend.ai_recommendation import generate_ai_recommendations
 
 
-# ============================================================
-# LOAD .ENV
-# ============================================================
-
 BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_FILE = BASE_DIR / ".env"
 
 load_dotenv(dotenv_path=ENV_FILE)
 
-
-# ============================================================
-# FASTAPI
-# ============================================================
 
 app = FastAPI(
     title="AI Recruitment Platform",
@@ -54,39 +46,35 @@ app = FastAPI(
 )
 
 
-# ============================================================
-# CORS
-# ============================================================
+ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "https://ai-recuirement.vercel.app",
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://ai-recuirement.vercel.app",
-    ],
+    allow_origins=ALLOWED_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"]
+    allow_methods=[
+        "GET",
+        "POST",
+        "PUT",
+        "DELETE",
+        "OPTIONS",
+        "PATCH"
+    ],
+    allow_headers=["*"],
 )
 
-
-# ============================================================
-# DATABASE
-# ============================================================
 
 def get_db():
     db = SessionLocal()
 
     try:
         yield db
-
     finally:
         db.close()
 
-
-# ============================================================
-# HOME
-# ============================================================
 
 @app.get("/")
 async def home():
@@ -95,13 +83,8 @@ async def home():
     }
 
 
-# ============================================================
-# TEST EMAIL
-# ============================================================
-
 @app.get("/test-email")
 def test_email():
-
     send_email(
         "YOUR_EMAIL@gmail.com",
         "AI Recruitment Test",
@@ -113,16 +96,11 @@ def test_email():
     }
 
 
-# ============================================================
-# SIGNUP
-# ============================================================
-
 @app.post("/signup")
 def signup(
     data: SignupRequest,
     db: Session = Depends(get_db)
 ):
-
     existing = db.query(User).filter(
         User.email == data.email
     ).first()
@@ -183,16 +161,11 @@ AI Recruitment Platform
     }
 
 
-# ============================================================
-# VERIFY EMAIL
-# ============================================================
-
 @app.post("/verify-email")
 def verify_email(
     data: VerifyEmailRequest,
     db: Session = Depends(get_db)
 ):
-
     user = db.query(User).filter(
         User.email == data.email
     ).first()
@@ -224,16 +197,11 @@ def verify_email(
     }
 
 
-# ============================================================
-# LOGIN
-# ============================================================
-
 @app.post("/login")
 def login(
     data: LoginRequest,
     db: Session = Depends(get_db)
 ):
-
     user = db.query(User).filter(
         User.email == data.email
     ).first()
@@ -257,14 +225,11 @@ def login(
         )
 
     try:
-
         valid = bcrypt.checkpw(
             data.password.encode("utf-8"),
             user.password.encode("utf-8")
         )
-
     except Exception:
-
         valid = False
 
     if not valid:
@@ -281,16 +246,11 @@ def login(
     }
 
 
-# ============================================================
-# GOOGLE LOGIN / SIGNUP
-# ============================================================
-
 @app.post("/auth/google")
 def google_login(
     data: dict,
     db: Session = Depends(get_db)
 ):
-
     credential = data.get("credential")
 
     if not credential:
@@ -299,9 +259,7 @@ def google_login(
             detail="Google credential is required"
         )
 
-    google_client_id = os.getenv(
-        "GOOGLE_CLIENT_ID"
-    )
+    google_client_id = os.getenv("GOOGLE_CLIENT_ID")
 
     if not google_client_id:
         raise HTTPException(
@@ -310,7 +268,6 @@ def google_login(
         )
 
     try:
-
         google_data = id_token.verify_oauth2_token(
             credential,
             requests.Request(),
@@ -349,13 +306,11 @@ def google_login(
         ).first()
 
         if not user:
-
             user = db.query(User).filter(
                 User.email == email
             ).first()
 
         if user:
-
             user.google_id = google_id
             user.is_verified = 1
             user.verification_otp = None
@@ -367,7 +322,6 @@ def google_login(
             db.refresh(user)
 
         else:
-
             user = User(
                 name=name or "Google User",
                 email=email,
@@ -390,18 +344,15 @@ def google_login(
         }
 
     except ValueError:
-
         raise HTTPException(
             status_code=401,
             detail="Invalid Google credential"
         )
 
     except HTTPException:
-
         raise
 
     except Exception as e:
-
         db.rollback()
 
         print(
@@ -414,16 +365,11 @@ def google_login(
         )
 
 
-# ============================================================
-# FORGOT PASSWORD
-# ============================================================
-
 @app.post("/forgot-password")
 def forgot_password(
     data: ForgotPasswordRequest,
     db: Session = Depends(get_db)
 ):
-
     user = db.query(User).filter(
         User.email == data.email
     ).first()
@@ -474,16 +420,11 @@ AI Recruitment Platform
     }
 
 
-# ============================================================
-# RESET PASSWORD
-# ============================================================
-
 @app.post("/reset-password")
 def reset_password(
     data: ResetPasswordRequest,
     db: Session = Depends(get_db)
 ):
-
     user = db.query(User).filter(
         User.email == data.email
     ).first()
@@ -515,15 +456,10 @@ def reset_password(
     }
 
 
-# ============================================================
-# GET ALL CANDIDATES
-# ============================================================
-
 @app.get("/candidates")
 def get_candidates(
     db: Session = Depends(get_db)
 ):
-
     return db.query(
         Candidate
     ).order_by(
@@ -531,16 +467,11 @@ def get_candidates(
     ).all()
 
 
-# ============================================================
-# GET SINGLE CANDIDATE
-# ============================================================
-
 @app.get("/candidates/{candidate_id}")
 def get_candidate(
     candidate_id: int,
     db: Session = Depends(get_db)
 ):
-
     candidate = db.query(
         Candidate
     ).filter(
@@ -556,16 +487,11 @@ def get_candidate(
     return candidate
 
 
-# ============================================================
-# CANDIDATE PROFILE
-# ============================================================
-
 @app.get("/candidate-profile/{candidate_id}")
 def get_candidate_profile(
     candidate_id: int,
     db: Session = Depends(get_db)
 ):
-
     candidate = db.query(
         Candidate
     ).filter(
@@ -579,14 +505,12 @@ def get_candidate_profile(
         )
 
     try:
-
         profile = profile_candidate(
             db,
             candidate
         )
 
         if profile is None:
-
             return {
                 "candidate_id": candidate.candidate_id,
                 "resume_file_name": candidate.resume_file_name,
@@ -617,7 +541,6 @@ def get_candidate_profile(
         return profile
 
     except Exception as e:
-
         db.rollback()
 
         print(
@@ -630,15 +553,10 @@ def get_candidate_profile(
         )
 
 
-# ============================================================
-# GET ALL JOBS
-# ============================================================
-
 @app.get("/jobs")
 def get_jobs(
     db: Session = Depends(get_db)
 ):
-
     return db.query(
         Job
     ).order_by(
@@ -646,16 +564,11 @@ def get_jobs(
     ).all()
 
 
-# ============================================================
-# GET SINGLE JOB
-# ============================================================
-
 @app.get("/jobs/{job_id}")
 def get_job(
     job_id: int,
     db: Session = Depends(get_db)
 ):
-
     job = db.query(
         Job
     ).filter(
@@ -671,15 +584,10 @@ def get_job(
     return job
 
 
-# ============================================================
-# GET APPLICATIONS
-# ============================================================
-
 @app.get("/applications")
 def get_applications(
     db: Session = Depends(get_db)
 ):
-
     return db.query(
         JobApplication
     ).order_by(
@@ -687,15 +595,10 @@ def get_applications(
     ).all()
 
 
-# ============================================================
-# DASHBOARD STATS
-# ============================================================
-
 @app.get("/dashboard-stats")
 def get_dashboard_stats(
     db: Session = Depends(get_db)
 ):
-
     candidates_count = db.query(
         func.count(Candidate.candidate_id)
     ).scalar()
@@ -724,17 +627,11 @@ def get_dashboard_stats(
     }
 
 
-# ============================================================
-# UPLOAD RESUME
-# ============================================================
-
 @app.post("/upload-resume")
 async def upload_resume(
     file: UploadFile = File(...)
 ):
-
     if not file.filename.lower().endswith(".pdf"):
-
         raise HTTPException(
             status_code=400,
             detail="Only PDF files are allowed"
@@ -749,12 +646,10 @@ async def upload_resume(
     temp_file = folder / file.filename
 
     try:
-
         with open(
             temp_file,
             "wb"
         ) as f:
-
             f.write(
                 await file.read()
             )
@@ -766,7 +661,6 @@ async def upload_resume(
         candidate_id = upload_result["candidate_id"]
 
         if upload_result.get("already_exists"):
-
             return {
                 "message": "Resume already existed",
                 "already_exists": True,
@@ -788,28 +682,21 @@ async def upload_resume(
         }
 
     except Exception as e:
-
         raise HTTPException(
             status_code=500,
             detail=str(e)
         )
 
     finally:
-
         if temp_file.exists():
             temp_file.unlink()
 
-
-# ============================================================
-# MATCH CANDIDATE
-# ============================================================
 
 @app.post("/match/{candidate_id}")
 def match_api(
     candidate_id: int,
     db: Session = Depends(get_db)
 ):
-
     candidate = db.query(
         Candidate
     ).filter(
@@ -817,14 +704,12 @@ def match_api(
     ).first()
 
     if not candidate:
-
         raise HTTPException(
             status_code=404,
             detail="Candidate not found"
         )
 
     try:
-
         result = match_candidate(
             db,
             candidate_id
@@ -836,7 +721,6 @@ def match_api(
         }
 
     except Exception as e:
-
         db.rollback()
 
         raise HTTPException(
@@ -845,16 +729,11 @@ def match_api(
         )
 
 
-# ============================================================
-# SKILL GAP
-# ============================================================
-
 @app.get("/skill-gap/{candidate_id}")
 def skill_gap_api(
     candidate_id: int,
     db: Session = Depends(get_db)
 ):
-
     candidate = db.query(
         Candidate
     ).filter(
@@ -862,14 +741,12 @@ def skill_gap_api(
     ).first()
 
     if not candidate:
-
         raise HTTPException(
             status_code=404,
             detail="Candidate not found"
         )
 
     try:
-
         result = analyze_candidate_skill_gaps(
             db,
             candidate_id
@@ -881,7 +758,6 @@ def skill_gap_api(
         }
 
     except Exception as e:
-
         db.rollback()
 
         raise HTTPException(
@@ -890,25 +766,17 @@ def skill_gap_api(
         )
 
 
-# ============================================================
-# RANKING
-# ============================================================
-
 @app.post("/ranking")
 def ranking_api(
     db: Session = Depends(get_db)
 ):
-
     try:
-
         results = generate_rankings(db)
 
         output = []
 
         for job_id, candidates in results.items():
-
             for item in candidates:
-
                 application = item["application"]
 
                 output.append({
@@ -932,7 +800,6 @@ def ranking_api(
         }
 
     except Exception as e:
-
         db.rollback()
 
         raise HTTPException(
@@ -941,16 +808,11 @@ def ranking_api(
         )
 
 
-# ============================================================
-# GET RANKING BY JOB
-# ============================================================
-
 @app.get("/ranking/{job_id}")
 def get_ranking(
     job_id: int,
     db: Session = Depends(get_db)
 ):
-
     applications = db.query(
         JobApplication
     ).filter(
@@ -962,7 +824,6 @@ def get_ranking(
     ).all()
 
     if not applications:
-
         raise HTTPException(
             status_code=404,
             detail="No applications found"
@@ -974,7 +835,6 @@ def get_ranking(
         applications,
         start=1
     ):
-
         match_score = float(
             application.match_score or 0
         ) * 100
@@ -985,8 +845,7 @@ def get_ranking(
 
         final_score = (
             match_score * 0.5
-            +
-            skill_score * 0.5
+            + skill_score * 0.5
         )
 
         results.append({
@@ -1006,23 +865,16 @@ def get_ranking(
     }
 
 
-# ============================================================
-# AI RECOMMENDATIONS
-# ============================================================
-
 @app.post("/ai-recommendations")
 def ai_recommendations(
     db: Session = Depends(get_db)
 ):
-
     try:
-
         return generate_ai_recommendations(
             db
         )
 
     except Exception as e:
-
         db.rollback()
 
         raise HTTPException(
@@ -1031,16 +883,11 @@ def ai_recommendations(
         )
 
 
-# ============================================================
-# GET AI RECOMMENDATIONS
-# ============================================================
-
 @app.get("/ai-recommendations/{job_id}")
 def get_ai_recommendations(
     job_id: int,
     db: Session = Depends(get_db)
 ):
-
     applications = db.query(
         JobApplication
     ).filter(
@@ -1052,7 +899,6 @@ def get_ai_recommendations(
     ).limit(5).all()
 
     if not applications:
-
         raise HTTPException(
             status_code=404,
             detail="No applications found"
@@ -1064,46 +910,32 @@ def get_ai_recommendations(
         applications,
         start=1
     ):
-
         if rank <= 2:
-
             recommendation_type = "RECOMMENDED"
-
         elif rank == 3:
-
             recommendation_type = "CONSIDER"
-
         else:
-
             recommendation_type = "NOT RECOMMENDED"
 
         if application.recommendation:
-
             try:
-
                 recommendation = json.loads(
                     application.recommendation
                 )
-
             except Exception:
-
                 recommendation = {}
-
         else:
-
             recommendation = {}
 
         recommendation["recommendation"] = recommendation_type
 
         if not recommendation.get("why"):
-
             recommendation["why"] = (
                 "Candidate evaluated based on ranking "
                 "and job requirements."
             )
 
         if recommendation_type != "NOT RECOMMENDED":
-
             recommendation.setdefault(
                 "strengths",
                 [
@@ -1123,7 +955,6 @@ def get_ai_recommendations(
             )
 
         else:
-
             recommendation.pop(
                 "strengths",
                 None
